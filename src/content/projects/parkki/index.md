@@ -39,7 +39,7 @@ specs:
   - { label: Built, value: "2026" }
 links:
   - label: Open Parkki
-    url: https://parkki-tampere.pages.dev/
+    url: https://treparkki.forsblom.dev/
 code: private
 images:
   - src: ./01-desktop.png
