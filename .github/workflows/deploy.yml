@@ -33,7 +33,13 @@ jobs:
       - name: Install the headless Chromium that prints the CV PDF
         run: npx playwright install --with-deps chromium-headless-shell
       - run: npm run check
+      # Without the CLOUDFLARE_API_TOKEN secret the checks still run, but nothing is published.
+      - name: No Cloudflare token yet
+        if: ${{ env.CLOUDFLARE_API_TOKEN == '' }}
+        run: echo "::warning::CLOUDFLARE_API_TOKEN is not set; the site was checked but not published"
       - name: Create the Pages project on the first run
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
         run: npx --yes wrangler@4 pages project create "$PROJECT" --production-branch main || true
       - name: Deploy
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' }}
         run: npx --yes wrangler@4 pages deploy dist --project-name "$PROJECT" --branch main --commit-dirty=true
