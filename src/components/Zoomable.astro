@@ -1,0 +1,35 @@
+---
+// Makes what it wraps (usually a <Picture>) open the image large in the lightbox; the page needs <Lightbox /> once.
+// Images with the same `group` can be stepped through with ← →. Without JavaScript it is a plain link to the large
+// image.
+//
+//   <Zoomable src={image} alt="What it shows" group="gallery"><Picture src={image} alt="…" … /></Zoomable>
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** Images of one group are stepped through together. */
+  group?: string;
+  /** The text under the large image; the alt text when left out. */
+  caption?: string;
+  /** The large image's width at most, in pixels (never wider than the original). */
+  maxWidth?: number;
+  class?: string;
+}
+
+const { src, alt, group = "default", caption = alt, maxWidth = 2000, class: cls } = Astro.props;
+const large = await getImage({ src, width: Math.min(src.width, maxWidth), format: "webp" });
+---
+
+<a
+  class:list={["zoomable", cls]}
+  href={large.src}
+  data-lightbox={group}
+  data-caption={caption}
+  data-alt={alt}
+  data-width={large.attributes.width}
+  data-height={large.attributes.height}
+  aria-label={`Show larger: ${alt}`}><slot /></a
+>

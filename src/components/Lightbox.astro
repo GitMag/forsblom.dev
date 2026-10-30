@@ -1,0 +1,10 @@
+---
+// The lightbox viewer: put <Lightbox /> once on a page, and every image wrapped in <Zoomable> (or a <Figure zoom>)
+// opens large when clicked, with ← → through the others of its group. The script and the styles are separate
+// files (src/scripts/lightbox.ts, src/styles/lightbox.css), so the page's strict CSP holds.
+import "../styles/lightbox.css";
+---
+
+<script>
+  import "../scripts/lightbox.ts";
+</script>

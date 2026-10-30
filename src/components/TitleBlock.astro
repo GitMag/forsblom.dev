@@ -6,6 +6,7 @@
 // light hairlines, light ink; `backdrop` puts a picture behind it, dimmed in the colour or blurred.
 import { Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import Zoomable from "./Zoomable.astro";
 
 interface Props {
   title: string;
@@ -21,6 +22,10 @@ interface Props {
   /** A picture behind a cover (a map, album art), dimmed in the family colour or blurred. */
   backdrop?: ImageMetadata;
   backdropStyle?: "dim" | "blur";
+  /** A cover's product shot: the app's top screenshot, shown in the cover's right-hand space on wide screens. */
+  shot?: { src: ImageMetadata; alt: string };
+  /** A lightbox group for the shot: it opens large when clicked (the page needs <Lightbox />). */
+  shotZoom?: string;
 }
 
 const {
@@ -33,11 +38,16 @@ const {
   project,
   backdrop,
   backdropStyle = "dim",
+  shot,
+  shotZoom,
 } = Astro.props;
+const shotPortrait = shot ? shot.src.height > shot.src.width : false;
 const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].filter((w) => w < img.width), img.width])];
 ---
 
-<header class:list={["tb", { "has-photo": !!photo, cover: !!project, [`bg-${backdropStyle}`]: !!backdrop }]} data-project={project}>
+<header
+  class:list={["tb", { "has-photo": !!photo, "has-shot": !!shot, cover: !!project, [`bg-${backdropStyle}`]: !!backdrop }]}
+  data-project={project}>
   {
     backdrop && (
       <div class="tb-bg" aria-hidden="true">
@@ -87,6 +97,37 @@ const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].f
               loading="eager"
             />
           </div>
+        )}
+      </div>
+    )
+  }
+  {
+    shot && (
+      <div class:list={["tb-shot", shotPortrait ? "portrait" : "landscape"]}>
+        {shotZoom ? (
+          <Zoomable src={shot.src} alt={shot.alt} group={shotZoom}>
+            <Picture
+              src={shot.src}
+              alt={shot.alt}
+              widths={(shotPortrait ? [240, 360, 480, 720] : [480, 720, 960, 1280]).filter((w) => w <= shot.src.width)}
+              sizes={shotPortrait ? "(min-width: 64rem) 13.5rem, 1px" : "(min-width: 64rem) 28rem, 1px"}
+              formats={["avif", "webp"]}
+              fallbackFormat="webp"
+              loading="lazy"
+              decoding="async"
+            />
+          </Zoomable>
+        ) : (
+          <Picture
+            src={shot.src}
+            alt={shot.alt}
+            widths={(shotPortrait ? [240, 360, 480, 720] : [480, 720, 960, 1280]).filter((w) => w <= shot.src.width)}
+            sizes={shotPortrait ? "(min-width: 64rem) 13.5rem, 1px" : "(min-width: 64rem) 28rem, 1px"}
+            formats={["avif", "webp"]}
+            fallbackFormat="webp"
+            loading="lazy"
+            decoding="async"
+          />
         )}
       </div>
     )
@@ -146,6 +187,47 @@ const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].f
     height: 100%;
     object-fit: cover;
     object-position: 50% 15%;
+  }
+
+  /* A cover's product shot, like the product photo on a datasheet's cover: only where the cover has spare room on
+     the right (from 64rem); on narrower screens the gallery right under the cover shows the same picture. */
+  .tb-shot {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .has-shot .tb-shot {
+      display: block;
+      grid-column: 2;
+      grid-row: 1;
+      align-self: center;
+      justify-self: end;
+      padding: 2rem 2rem 2rem 1rem;
+    }
+
+    .has-shot .tb-fields {
+      grid-column: 1 / -1;
+    }
+
+    .tb-shot :global(picture),
+    .tb-shot :global(img) {
+      display: block;
+    }
+
+    .tb-shot :global(img) {
+      border: 1px solid var(--field-line, var(--line));
+      box-shadow: 0 1.25rem 3rem rgb(0 0 0 / 0.35);
+    }
+
+    .tb-shot.portrait :global(img) {
+      width: 13.5rem;
+      height: auto;
+    }
+
+    .tb-shot.landscape :global(img) {
+      width: 28rem;
+      height: auto;
+    }
   }
 
   /* The fields: every cell draws a hairline on its top and left; the outer ones are pulled under the box's own

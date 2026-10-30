@@ -53,7 +53,7 @@ links:                          # buttons, optional
   - label: Open Parkki
     url: https://parkki-tampere.pages.dev/
 code: private                   # or the URL of the public code, e.g. https://github.com/GitMag/x
-images:                         # optional; the first one is the card picture
+images:                         # optional; the first one is the card picture and the cover's product shot
   - src: ./01-train.png         # a file in the same folder
     alt: What the picture shows, in one sentence.
     frame: phone                # phone, tv, browser or none
@@ -71,6 +71,7 @@ Under the second `---` is the page text in Markdown: `## Heading`, paragraphs, `
   Phone screenshots look best at 720 × 1560 px (a 360 × 780 phone at 2×), TV ones at 1920 × 1080 or larger.
 - **Reorder or feature projects:** change `order` and `card`.
 - **Hide a project for a while:** `hidden: true`.
+- On a project page every screenshot opens larger when clicked; nothing to set. The clip (`video`) plays in place.
 
 ## CV (`cv.yaml`)
 

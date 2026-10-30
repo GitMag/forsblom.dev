@@ -7,6 +7,7 @@ import TitleBlock from "../../components/TitleBlock.astro";
 import Section from "../../components/Section.astro";
 import Figure from "../../components/Figure.astro";
 import VideoFigure from "../../components/VideoFigure.astro";
+import Lightbox from "../../components/Lightbox.astro";
 import SpecTable from "../../components/SpecTable.astro";
 import BlockDiagram from "../../components/BlockDiagram.astro";
 import RevisionHistory from "../../components/RevisionHistory.astro";
@@ -86,7 +87,14 @@ for (let i = 0; i < images.length; ) {
   imageHeight={share ? Number(share.attributes.height) : undefined}
   project={project.id}
 >
-  <TitleBlock title={title} subtitle={subtitle} project={project.id} backdrop={backdrop} backdropStyle={video ? "blur" : "dim"}>
+  <TitleBlock
+    title={title}
+    subtitle={subtitle}
+    project={project.id}
+    backdrop={backdrop}
+    backdropStyle={video ? "blur" : "dim"}
+    shot={images[0] ? { src: images[0].src, alt: images[0].alt } : video ? { src: video.poster, alt: video.caption } : undefined}
+    shotZoom="screenshots">
     <p class="lead">{tagline}</p>
     {
       why && (
@@ -168,6 +176,7 @@ for (let i = 0; i < images.length; ) {
                     alt={cell.img.alt}
                     loading={cell.index === 0 ? "eager" : "lazy"}
                     sizes={isPortrait(cell.img) ? "(min-width: 48rem) 20rem, 62vw" : "(min-width: 48rem) 68rem, 88vw"}
+                    zoom="screenshots"
                   />
                 </div>
               ),
@@ -201,6 +210,8 @@ for (let i = 0; i < images.length; ) {
       </Section>
     )
   }
+
+  <Lightbox />
 
   <nav class="pager" aria-label="Other projects">
     {

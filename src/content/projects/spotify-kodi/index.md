@@ -3,7 +3,7 @@ title: Spotify for Kodi
 subtitle: Spotify on the TV
 tagline: "Spotify on the TV: browse and play your music in Kodi with a game controller."
 tags: [Kodi add-on, Python]
-card: small
+card: featured
 order: 5
 stack: [Python, Kodi add-on API, Spotify Web API, OAuth 2 (PKCE), D-Bus/MPRIS]
 accent: "#d6457f"
