@@ -1,0 +1,28 @@
+---
+// A numbered section: a rule, "N  Title", then the content. The number comes from a CSS counter (global.css),
+// so sections are numbered in page order; entries inside with class "sub" get N.1, N.2…
+interface Props {
+  title: string;
+  id?: string;
+  /** Print only: hidden on screen, numbered only in print. */
+  printOnly?: boolean;
+}
+const { title, id, printOnly = false } = Astro.props;
+---
+
+<section class:list={["sec", { "print-only": printOnly }]} id={id}>
+  <h2>{title}</h2>
+  <slot />
+</section>
+
+<style>
+  .print-only {
+    display: none;
+  }
+
+  @media print {
+    .print-only {
+      display: block;
+    }
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+// A project's specification table: the `specs` rows from the front matter, then Stack and Code.
+// compact = three rows for the entry lists: Platform, Data (or the row after Platform) and Status.
+interface Props {
+  specs: { label: string; value: string }[];
+  stack?: string[];
+  code?: "private" | string;
+  compact?: boolean;
+  caption?: string;
+}
+
+const { specs, stack, code, compact = false, caption } = Astro.props;
+const is = (label: string, name: string) => label.toLowerCase() === name;
+const find = (name: string) => specs.find((s) => is(s.label, name));
+
+function compactRows() {
+  const platform = find("platform");
+  const status = find("status");
+  const middle = find("data") ?? specs.find((s) => s !== platform && s !== status);
+  return [platform, middle, status].filter((s): s is { label: string; value: string } => !!s);
+}
+
+const rows = compact ? compactRows() : specs;
+---
+
+<table class="specs">
+  {caption && <caption>{caption}</caption>}
+  <tbody>
+    {
+      rows.map((row) => (
+        <tr>
+          <th scope="row">{row.label}</th>
+          <td>
+            {is(row.label, "status") ? (
+              <span class="status">
+                <i class="led" aria-hidden="true" />
+                {row.value}
+              </span>
+            ) : (
+              row.value
+            )}
+          </td>
+        </tr>
+      ))
+    }
+    {
+      !compact && stack && (
+        <tr>
+          <th scope="row">Stack</th>
+          <td>{stack.join(", ")}</td>
+        </tr>
+      )
+    }
+    {
+      !compact && code && (
+        <tr>
+          <th scope="row">Code</th>
+          <td>{code === "private" ? "Private" : <a href={code}>{code.replace(/^https?:\/\//, "")}</a>}</td>
+        </tr>
+      )
+    }
+  </tbody>
+</table>

@@ -1,18 +1,20 @@
 ---
-// The home page: the hero (name, intro, what I'm doing now, three buttons, the photo), the featured projects as
-// bands, the small projects as cards, and a link to all projects.
+// The home page: the title block (name, role, photo, what I'm doing now, contact), 1 Overview (the intro and
+// three buttons) and 2 Projects (the selection table, then one entry per project).
 import Base from "../layouts/Base.astro";
-import Portrait from "../components/Portrait.astro";
-import ProjectBand from "../components/ProjectBand.astro";
-import ProjectCard from "../components/ProjectCard.astro";
+import TitleBlock from "../components/TitleBlock.astro";
+import Section from "../components/Section.astro";
+import SelectionTable from "../components/SelectionTable.astro";
+import ProjectEntry from "../components/ProjectEntry.astro";
 import { getEntry } from "astro:content";
 import { listProjects } from "../lib/projects";
-import { roleFrom } from "../lib/site";
+import { bareUrl, revision, roleFrom } from "../lib/site";
 
 const site = (await getEntry("site", "site"))!.data;
 const projects = await listProjects();
 const featured = projects.filter((p) => p.data.card === "featured");
 const small = projects.filter((p) => p.data.card === "small");
+const role = roleFrom(site.title);
 
 // Structured data for search engines.
 const person = {
@@ -20,7 +22,7 @@ const person = {
   "@type": "Person",
   name: site.name,
   url: Astro.site?.href,
-  jobTitle: roleFrom(site.title),
+  jobTitle: role,
   email: `mailto:${site.email}`,
   address: { "@type": "PostalAddress", addressLocality: site.location },
   sameAs: site.links.map((l) => l.url),
@@ -32,116 +34,50 @@ const person = {
     <script type="application/ld+json" is:inline set:html={JSON.stringify(person)} />
   </Fragment>
 
-  <section class="container hero">
-    <Portrait src={site.photo} alt={site.photoAlt} sizes="(min-width: 56rem) 17rem, 5.5rem" class="photo" />
-    <div class="text">
-      <h1>{site.name}</h1>
-      <p class="lead">{site.hero}</p>
-      <div class="currently">
-        <p class="eyebrow">Currently</p>
-        <ul>{site.currently.map((line) => <li>{line}</li>)}</ul>
+  <TitleBlock title={site.name} subtitle={`${role} · ${site.location}`} photo={site.photo} photoAlt={site.photoAlt}>
+    <Fragment slot="fields">
+      <div>
+        <dt>Currently</dt>
+        <dd><ul>{site.currently.map((line) => <li>{line}</li>)}</ul></dd>
       </div>
-      <div class="actions">
-        <a class="btn btn-primary" href="#projects">See projects</a>
-        <a class="btn" href="/about/">Read the CV</a>
-        <a class="btn" href={`mailto:${site.email}`}>Email me</a>
+      <div>
+        <dt>Contact</dt>
+        <dd>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          {site.links.map((l) => <><br /><a href={l.url}>{bareUrl(l.url)}</a></>)}
+        </dd>
       </div>
-    </div>
-  </section>
+      <div>
+        <dt>Revision</dt>
+        <dd>{revision}</dd>
+      </div>
+    </Fragment>
+  </TitleBlock>
 
-  <section class="container projects" id="projects">
-    <h2 class="section-title">Projects</h2>
-    <div class="bands">{featured.map((p, i) => <ProjectBand project={p} eager={i === 0} />)}</div>
-    {small.length > 0 && <div class="cards">{small.map((p) => <ProjectCard project={p} visual />)}</div>}
-    <p class="all"><a href="/projects/">All projects →</a></p>
-  </section>
+  <Section title="Overview" id="overview">
+    <p class="lead">{site.hero}</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="#projects">Projects</a>
+      <a class="btn" href="/about/">About / CV</a>
+      <a class="btn" href={`mailto:${site.email}`}>Email</a>
+    </div>
+  </Section>
+
+  <Section title="Projects" id="projects">
+    <SelectionTable projects={projects} caption="Project selection guide" />
+    <div class="entries">
+      {featured.map((p, i) => <ProjectEntry project={p} eager={i === 0} />)}
+      {small.map((p) => <ProjectEntry project={p} compact />)}
+    </div>
+  </Section>
 </Base>
 
 <style>
-  .hero {
-    padding-block: clamp(3rem, 8vw, 6.5rem) clamp(4rem, 9vw, 7rem);
+  .actions {
+    margin-top: 1.5rem;
   }
 
-  .text::before {
-    content: "";
-    display: block;
-    width: 3rem;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--accent);
-    margin-bottom: 2rem;
-  }
-
-  /* On a phone the photo is small and sits beside the name; the text flows around it. */
-  .hero :global(.photo) {
-    float: right;
-    width: 5.5rem;
-    margin: 2.9rem 0 0.75rem 1.25rem;
-  }
-
-  @media (min-width: 56rem) {
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 17rem;
-      column-gap: 4rem;
-      align-items: start;
-    }
-
-    .hero :global(.photo) {
-      float: none;
-      width: auto;
-      margin: 0;
-      grid-column: 2;
-      grid-row: 1;
-    }
-
-    .text {
-      grid-column: 1;
-      grid-row: 1;
-    }
-  }
-
-  .hero h1 {
-    margin-bottom: 1.25rem;
-  }
-
-  .currently {
-    margin-top: 2rem;
-    display: grid;
-    gap: 0.4rem;
-  }
-
-  .currently ul {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  .currently li::before {
-    content: "—";
-    color: var(--accent);
-    margin-right: 0.6em;
-  }
-
-  .hero .actions {
-    margin-top: 2.25rem;
-  }
-
-  .bands {
-    display: grid;
-    gap: clamp(3.5rem, 8vw, 6rem);
-  }
-
-  .cards {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-    margin-top: clamp(3.5rem, 8vw, 5.5rem);
-  }
-
-  .all {
+  .entries {
     margin-top: 2.5rem;
-    font-weight: 500;
   }
 </style>

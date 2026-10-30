@@ -1,0 +1,41 @@
+---
+// A short muted clip as a numbered figure, in the same style as Figure.astro: on the project's colour panel, with
+// a hairline outline and a "Figure N." caption. It plays on its own, muted and looping, like a moving screenshot.
+import { existsSync } from "node:fs";
+import { getImage } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  /** The clip in public/media/, e.g. /media/clip.mp4. */
+  src: string;
+  /** Shown until the clip starts, and where video doesn't play. */
+  poster: ImageMetadata;
+  caption: string;
+}
+
+const { src, poster, caption } = Astro.props;
+// A WebM copy next to the MP4 (same name) is offered too, for browsers without H.264.
+const webm = src.replace(/\.mp4$/, ".webm");
+const hasWebm = existsSync(`public${webm}`);
+const still = await getImage({ src: poster, width: Math.min(poster.width, 1600), format: "webp" });
+---
+
+<figure class="fig fig-landscape fig-video">
+  <div class="plate">
+    <video
+      poster={still.src}
+      width={poster.width}
+      height={poster.height}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      disablepictureinpicture
+      aria-label={caption}>
+      <source src={src} type="video/mp4" />
+      {hasWebm && <source src={webm} type="video/webm" />}
+    </video>
+  </div>
+  <figcaption>{caption}</figcaption>
+</figure>

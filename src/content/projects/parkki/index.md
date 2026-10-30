@@ -6,6 +6,15 @@ tags: [Web, Open data, Live]
 card: featured
 order: 2
 stack: [TypeScript, React, MapLibre GL, Vite, vitest, GitHub Actions, Cloudflare Pages]
+accent: "#7b4bd6"
+application: "Driving into the centre at 17:30 for two hours: set the time, and the map shows where the parking disc is enough, what the paid streets cost and which garage is cheapest."
+specs:
+  - { label: Platform, value: "Static web app, phone-first" }
+  - { label: Data, value: "City of Tampere open geodata (CC BY 4.0), about 3,200 parking areas; garage operators' price lists" }
+  - { label: Refresh, value: "Daily, GitHub Actions" }
+  - { label: Hosting, value: "Cloudflare Pages; no server, no login" }
+  - { label: Status, value: "Live, public" }
+  - { label: Built, value: "2026" }
 links:
   - label: Open Parkki
     url: https://parkki-tampere.pages.dev/

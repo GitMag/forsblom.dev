@@ -34,6 +34,11 @@ tags: [Web app, PWA]            # small labels
 card: featured                  # featured = big card on the home page, small = smaller card
 order: 3                        # position, smallest first
 stack: [TypeScript, React]      # technologies; a CV skill with the same name links here
+accent: "#0e8a7a"               # the app's own colour: markers, bands and screenshot panels
+application: "Between sets: …"  # "Typical application": one sentence about the app in real use
+specs:                          # the spec table on the project page, in this order
+  - { label: Platform, value: "Installable web app (PWA)" }
+  - { label: Status, value: "In use" }
 links:                          # buttons, optional
   - label: Open Parkki
     url: https://parkki-tampere.pages.dev/
@@ -42,6 +47,10 @@ images:                         # optional; the first one is the card picture
   - src: ./01-train.png         # a file in the same folder
     alt: What the picture shows, in one sentence.
     frame: phone                # phone, tv, browser or none
+video:                          # optional: a short muted clip, shown first on the page
+  src: /media/clip.mp4          # the file goes in public/media/
+  poster: ./00-poster.jpg       # a still shown until it plays
+  caption: What the clip shows.
 hidden: false                   # true = left off the site
 ```
 

@@ -6,6 +6,16 @@ tags: [Web app, PWA]
 card: featured
 order: 3
 stack: [TypeScript, React, TanStack Query, Hono, SQLite, Vite, vitest, Playwright, PWAs]
+accent: "#0e8a7a"
+application: "Between sets: tick the set with one thumb, the rest timer starts by itself, and next time the app suggests the weight to try."
+specs:
+  - { label: Platform, value: "Installable web app (PWA)" }
+  - { label: Users, value: "A few friends, each with their own sign-in" }
+  - { label: Storage, value: "One SQLite file" }
+  - { label: Hosting, value: "Home server, reached over Tailscale" }
+  - { label: Languages, value: "Finnish, English" }
+  - { label: Status, value: "In use" }
+  - { label: Built, value: "2026" }
 code: private
 images:
   - src: ./01-train.png

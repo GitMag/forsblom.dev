@@ -2,8 +2,7 @@
 intro: >-
   I'm a software developer and a master's student in Information Technology at Tampere University. At work I build
   full-stack web software and write embedded C for industrial field devices. In my own time I build apps for
-  everyday problems, mostly in TypeScript and Python. I like work where the hardware, the software and the person
-  using it all have to agree.
+  everyday problems, mostly in TypeScript and Python.
 
 work:
   - org: Aline

@@ -1,0 +1,185 @@
+---
+// The document header of a page, like a datasheet's title block: a ruled box with the title and subtitle, the
+// page's own content under them (a description, buttons), a photo cell on the right when there is a photo, and a
+// row of small labelled fields below (pass them in the "fields" slot as <div><dt>Label</dt><dd>Value</dd></div>).
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  photo?: ImageMetadata;
+  photoAlt?: string;
+  /** The sizes attribute for the photo; see the widths in the component. */
+  photoSizes?: string;
+  /** A project's slug: the block gets a band in the project's colour (see /accents.css). */
+  project?: string;
+}
+
+const { title, subtitle, photo, photoAlt = "", photoSizes = "(min-width: 48rem) 11rem, 6.5rem", project } = Astro.props;
+const widths = photo ? [...new Set([...[200, 300, 400, 600].filter((w) => w < photo.width), photo.width])] : [];
+---
+
+<header class:list={["tb", { "has-photo": !!photo }]} data-project={project}>
+  <div class="tb-main">
+    <h1>{title}</h1>
+    {subtitle && <p class="tb-sub">{subtitle}</p>}
+    <slot />
+  </div>
+  {
+    photo && (
+      <div class="tb-photo">
+        <Picture
+          src={photo}
+          alt={photoAlt}
+          widths={widths}
+          sizes={photoSizes}
+          formats={["avif", "webp"]}
+          fallbackFormat="jpg"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+    )
+  }
+  <dl class="tb-fields">
+    <slot name="fields" />
+  </dl>
+</header>
+
+<style>
+  .tb {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border: 1px solid var(--ink);
+    margin-top: 2rem;
+  }
+
+  /* A project's title block: a band in its colour along the top edge. */
+  .tb[data-project] {
+    border-top: 5px solid var(--accent);
+  }
+
+  .tb-main {
+    grid-column: 1;
+    grid-row: 1;
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    padding: 1.5rem;
+  }
+
+  .tb-main h1 {
+    margin-bottom: 0.25rem;
+  }
+
+  .tb-sub {
+    font-size: 1.05rem;
+    color: var(--ink-2);
+  }
+
+  .tb-photo {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: 11rem;
+    border-left: 1px solid var(--ink);
+  }
+
+  .tb-photo :global(picture),
+  .tb-photo :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 15%;
+  }
+
+  /* The fields: every cell draws a hairline on its top and left; the outer ones are pulled under the box's own
+     border and clipped, so only the lines between cells remain. */
+  .tb-fields {
+    grid-column: 1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    border-top: 1px solid var(--ink);
+    overflow: hidden;
+  }
+
+  .tb-fields > :global(div) {
+    padding: 0.7rem 1.5rem;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+    margin: -1px 0 0 -1px;
+    min-width: 0;
+  }
+
+  .tb-fields :global(dt) {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: 0.15rem;
+  }
+
+  .tb-fields :global(dd) {
+    margin: 0;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+
+  .tb-fields :global(ul) {
+    list-style: none;
+    padding: 0;
+  }
+
+  /* Phones: the photo sits beside the title only, the fields stack under both. */
+  @media (max-width: 47.99rem) {
+    .tb-main {
+      padding: 1.1rem 1rem;
+    }
+
+    .tb-photo {
+      grid-row: 1;
+      width: 6.5rem;
+    }
+
+    .tb-fields {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr;
+    }
+
+    .tb-fields > :global(div) {
+      padding: 0.6rem 1rem;
+    }
+  }
+
+  @media print {
+    .tb {
+      margin-top: 0;
+    }
+
+    .tb-main {
+      padding: 0.8rem 1rem;
+      gap: 0.3rem;
+    }
+
+    .tb-sub {
+      font-size: 0.95rem;
+    }
+
+    .tb-photo {
+      width: 26mm;
+    }
+
+    .tb-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tb-fields > :global(div) {
+      padding: 0.45rem 1rem;
+    }
+  }
+</style>

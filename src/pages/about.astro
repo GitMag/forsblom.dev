@@ -1,14 +1,14 @@
 ---
 // The About page, which is also the CV: everything comes from src/content/cv.yaml and site.yaml.
-// It prints as the CV PDF (scripts/cv-pdf.ts): the nav, the footer and the buttons disappear, the contact line
-// is written out and a short "Selected projects" list appears.
+// It prints as the CV PDF (scripts/cv-pdf.ts): the nav, the footer and the buttons disappear, the title block
+// keeps the photo and the written-out contact links, and a "Selected projects" section appears.
 import Base from "../layouts/Base.astro";
-import Portrait from "../components/Portrait.astro";
-import CvSection from "../components/CvSection.astro";
+import TitleBlock from "../components/TitleBlock.astro";
+import Section from "../components/Section.astro";
 import CvEntry from "../components/CvEntry.astro";
 import { getEntry } from "astro:content";
-import { listProjects, projectsUsing, projectUrl } from "../lib/projects";
-import { roleFrom } from "../lib/site";
+import { listProjects, projectUrl } from "../lib/projects";
+import { bareUrl, revision, roleFrom } from "../lib/site";
 
 const site = (await getEntry("site", "site"))!.data;
 const cv = (await getEntry("cv", "cv"))!.data;
@@ -20,293 +20,197 @@ const projectById = (id: string) => projects.find((p) => p.id === id);
 ---
 
 <Base title="About / CV">
-  <div class="container cv">
-    <header class="head">
-      <div class="who">
-        <h1>{site.name}</h1>
-        <p class="role">{role} · {site.location}</p>
-        <ul class="contact-line">
-          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-          {
-            site.links.map((l) => (
-              <li>
-                <a href={l.url}>
-                  <span class="label">{l.label}</span>
-                  <span class="url">{l.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-        <a class="btn btn-primary" href={pdf} download>Download CV (PDF)</a>
+  <TitleBlock title={site.name} subtitle={`${role} · ${site.location}`} photo={site.photo} photoAlt={site.photoAlt}>
+    <div class="actions">
+      <a class="btn btn-primary" href={pdf} download>Download CV (PDF)</a>
+    </div>
+    <Fragment slot="fields">
+      <div>
+        <dt>Email</dt>
+        <dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
       </div>
-      <Portrait src={site.photo} alt={site.photoAlt} sizes="(min-width: 48rem) 10rem, 5.5rem" class="photo" />
-    </header>
-
-    <p class="lead intro">{cv.intro}</p>
-
-    <CvSection title="Work" id="work">
-      {cv.work.map((w) => <CvEntry org={w.org} role={w.role} from={w.from} to={w.to} place={w.place} points={w.points} />)}
-      {cv.earlier && <p class="earlier">{cv.earlier}</p>}
-    </CvSection>
-
-    <CvSection title="Education" id="education">
-      {cv.education.map((e) => <CvEntry org={e.org} role={e.field} from={e.from} to={e.to} points={e.points} />)}
-    </CvSection>
-
-    <CvSection title="Selected projects" id="selected-projects" printOnly>
-      <ul class="print-projects">
-        {
-          projects.map((p) => (
-            <li>
-              <strong>{p.data.title}</strong>: {p.data.tagline} <span class="url">{host}{projectUrl(p)}</span>
-            </li>
-          ))
-        }
-      </ul>
-    </CvSection>
-
-    <CvSection title="Skills" id="skills">
       {
-        cv.skills.map((group) => (
-          <div class="skill-group">
-            <p class="eyebrow">{group.group}</p>
-            <ul class="chips">
-              {group.items.map((item) => {
-                const used = projectsUsing(item, projects);
-                return (
-                  <li class="chip">
-                    {item}
-                    {used.length > 0 && (
-                      <span class="used">
-                        {used.map((p, i) => (
-                          <>
-                            {i > 0 && ", "}
-                            <a href={projectUrl(p)}>{p.data.title}</a>
-                          </>
-                        ))}
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+        site.links.map((l) => (
+          <div>
+            <dt>{l.label}</dt>
+            <dd>
+              <a href={l.url}>{bareUrl(l.url)}</a>
+            </dd>
           </div>
         ))
       }
-    </CvSection>
+      <div>
+        <dt>Revision</dt>
+        <dd>{revision}</dd>
+      </div>
+    </Fragment>
+  </TitleBlock>
 
-    <CvSection title="Languages" id="languages">
-      <ul class="languages">
+  <Section title="Profile" id="profile">
+    <p class="lead">{cv.intro}</p>
+  </Section>
+
+  <Section title="Work experience" id="work">
+    {cv.work.map((w) => <CvEntry org={w.org} role={w.role} from={w.from} to={w.to} place={w.place} points={w.points} />)}
+    {cv.earlier && <p class="earlier">{cv.earlier}</p>}
+  </Section>
+
+  <Section title="Education" id="education">
+    {cv.education.map((e) => <CvEntry org={e.org} role={e.field} from={e.from} to={e.to} points={e.points} />)}
+  </Section>
+
+  <Section title="Selected projects" id="selected-projects" printOnly>
+    <table class="print-projects">
+      <tbody>
         {
-          cv.languages.map((l) => (
-            <li>
-              <span class="name">{l.name}</span> <span class="level">{l.level}</span>
-            </li>
+          projects.map((p) => (
+            <tr>
+              <th scope="row">{p.data.title}</th>
+              <td>
+                {p.data.tagline} <span class="mono url">{host}{projectUrl(p)}</span>
+              </td>
+            </tr>
           ))
         }
-      </ul>
-    </CvSection>
+      </tbody>
+    </table>
+  </Section>
 
-    <CvSection title="Interests" id="interests">
-      <ul class="chips">
+  <Section title="Skills" id="skills">
+    <table class="specs">
+      <tbody>
         {
-          cv.interests.map((i) => {
-            const p = i.project ? projectById(i.project) : undefined;
-            return (
-              <li class="chip">
-                {i.name}
-                {p && <a href={projectUrl(p)}>{p.data.title}</a>}
-              </li>
-            );
-          })
+          cv.skills.map((group) => (
+            <tr>
+              <th scope="row">{group.group}</th>
+              <td>{group.items.join(", ")}</td>
+            </tr>
+          ))
         }
-      </ul>
-    </CvSection>
+      </tbody>
+    </table>
+  </Section>
 
-    <div class="no-print">
-      <CvSection title="Contact" id="contact">
-        <ul class="contact">
-          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-          {site.links.map((l) => <li><a href={l.url}>{l.label}</a></li>)}
-        </ul>
-        <p><a class="btn" href={pdf} download>Download CV (PDF)</a></p>
-      </CvSection>
-    </div>
+  <Section title="Languages" id="languages">
+    <table class="languages">
+      <thead>
+        <tr>
+          <th>Language</th>
+          <th>Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          cv.languages.map((l) => (
+            <tr>
+              <th scope="row">{l.name}</th>
+              <td>{l.level}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </Section>
+
+  <Section title="Interests" id="interests">
+    <p class="interests">
+      {
+        cv.interests.map((i, n) => {
+          const p = i.project ? projectById(i.project) : undefined;
+          return (
+            <>
+              {n > 0 && ", "}
+              {i.name}
+              {p && (
+                <>
+                  {" "}
+                  (<a href={projectUrl(p)}>{p.data.title}</a>)
+                </>
+              )}
+            </>
+          );
+        })
+      }
+    </p>
+  </Section>
+
+  <div class="no-print">
+    <Section title="Contact" id="contact">
+      <table class="specs contact">
+        <tbody>
+          <tr>
+            <th scope="row">Email</th>
+            <td><a href={`mailto:${site.email}`}>{site.email}</a></td>
+          </tr>
+          {
+            site.links.map((l) => (
+              <tr>
+                <th scope="row">{l.label}</th>
+                <td>
+                  <a href={l.url}>{bareUrl(l.url)}</a>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="actions"><a class="btn" href={pdf} download>Download CV (PDF)</a></p>
+    </Section>
   </div>
 </Base>
 
 <style>
-  .cv {
-    padding-top: clamp(2rem, 5vw, 3.5rem);
-  }
-
-  .head {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: 1rem 1.5rem;
-  }
-
-  .head :global(.photo) {
-    width: 5.5rem;
-  }
-
-  @media (min-width: 48rem) {
-    .head {
-      column-gap: 3rem;
-    }
-
-    .head :global(.photo) {
-      width: 10rem;
-    }
-  }
-
-  .who {
-    display: grid;
-    gap: 0.5rem;
-    justify-items: start;
-  }
-
-  .who .btn {
-    margin-top: 0.75rem;
-  }
-
-  .role {
-    font-size: 1.15rem;
-    color: var(--muted);
-  }
-
-  .contact-line {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 1.25rem;
-    list-style: none;
-    padding: 0;
-    font-weight: 500;
-    font-size: 0.95rem;
-  }
-
-  .contact-line .url {
-    display: none;
-  }
-
-  .intro {
-    margin-block: 2.5rem 3rem;
-  }
-
   .earlier {
-    color: var(--muted);
+    margin-top: 1rem;
+    color: var(--ink-2);
     max-width: var(--measure);
   }
 
-  .skill-group {
-    display: grid;
-    gap: 0.6rem;
-  }
-
-  .chip .used {
-    font-size: 0.9em;
-  }
-
-  .chip .used::before {
-    content: "·";
-    margin-right: 0.5em;
-    color: var(--line);
-  }
-
   .languages {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 2.5rem;
-    list-style: none;
-    padding: 0;
+    max-width: 24rem;
   }
 
-  .languages .name {
-    font-weight: 500;
-  }
-
-  .languages .level {
-    color: var(--muted);
+  .interests {
+    max-width: var(--measure);
   }
 
   .contact {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: 0.4rem;
-    font-weight: 500;
+    max-width: 32rem;
   }
 
-  .print-projects {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    gap: 0.35rem;
+  .contact + .actions {
+    margin-top: 1.25rem;
+  }
+
+  .print-projects th {
+    width: 9rem;
+    white-space: nowrap;
   }
 
   .print-projects .url {
-    color: var(--muted);
-    font-family: var(--font-mono);
+    color: var(--ink-2);
     font-size: 0.85em;
   }
 
   /* ---- The CV PDF ---- */
   @page {
     size: A4;
-    margin: 14mm 16mm 16mm;
+    margin: 13mm 15mm 15mm;
   }
 
   @media print {
-    .cv {
-      padding-top: 0;
-    }
-
-    .head {
-      column-gap: 8mm;
-    }
-
-    .head :global(.photo) {
-      width: 26mm;
-    }
-
-    .head h1 {
-      font-size: 2rem;
-    }
-
-    .role {
-      font-size: 1.05rem;
-    }
-
-    .contact-line {
-      font-size: 0.85rem;
-      font-weight: 400;
-      gap: 0.1rem 0.9rem;
-    }
-
-    .contact-line .label {
-      display: none;
-    }
-
-    .contact-line .url {
-      display: inline;
-    }
-
-    .intro {
-      font-size: 1.05rem;
-      margin-block: 1rem 1.2rem;
+    .lead {
+      font-size: 1rem;
       max-width: none;
     }
 
-    .skill-group {
-      gap: 0.3rem;
+    .earlier {
+      margin-top: 0.5rem;
     }
 
-    /* The project links inside chips: the Selected projects list covers them. */
-    .chip .used,
-    .chip a {
-      display: none;
+    /* The project links in the interests line: the Selected projects table covers them. */
+    .interests a::after {
+      content: "";
     }
   }
 </style>

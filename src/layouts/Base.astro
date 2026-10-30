@@ -2,11 +2,12 @@
 // The page shell: <head> (title, description, canonical, Open Graph, icons), the nav and the footer.
 // Pages pass a title and a description; a project page can pass its own share image.
 import "../styles/global.css";
-import frauncesUrl from "@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url";
-import schibstedUrl from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url";
+import sansUrl from "@fontsource-variable/ibm-plex-sans/files/ibm-plex-sans-latin-wght-normal.woff2?url";
+import monoUrl from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url";
 import { getEntry } from "astro:content";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import { revision } from "../lib/site";
 
 interface Props {
   /** Page title; the home page leaves it out and gets the site title. */
@@ -17,10 +18,12 @@ interface Props {
   imageWidth?: number;
   imageHeight?: number;
   ogType?: "website" | "article";
+  /** A project page: its slug, so the whole page takes the project's accent (see /accents.css). */
+  project?: string;
 }
 
 const site = (await getEntry("site", "site"))!.data;
-const { title, description = site.description, image = "/og.png", imageWidth = 1200, imageHeight = 630, ogType = "website" } = Astro.props;
+const { title, description = site.description, image = "/og.png", imageWidth = 1200, imageHeight = 630, ogType = "website", project } = Astro.props;
 const fullTitle = title ? `${title} · ${site.name}` : site.title;
 const canonical = new URL(Astro.url.pathname.replace(/\/?$/, "/"), Astro.site);
 const ogImage = new URL(image, Astro.site);
@@ -34,14 +37,15 @@ const ogImage = new URL(image, Astro.site);
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf8f4" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1c1a17" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={schibstedUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={sansUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/accents.css" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={fullTitle} />
@@ -58,9 +62,9 @@ const ogImage = new URL(image, Astro.site);
   </head>
   <body>
     <Nav name={site.name} />
-    <main>
+    <main class="container" data-project={project}>
       <slot />
     </main>
-    <Footer email={site.email} links={site.links} note={site.footerNote} sourceUrl={site.sourceUrl} />
+    <Footer email={site.email} links={site.links} note={site.footerNote} sourceUrl={site.sourceUrl} host={Astro.site?.host ?? ""} revision={revision} />
   </body>
 </html>

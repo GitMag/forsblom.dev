@@ -23,6 +23,12 @@ const projects = defineCollection({
       /** Order on the home page and the projects page, smallest first. */
       order: z.number(),
       stack: z.array(z.string()).min(1),
+      /** The app's own colour (#rrggbb), used for this project's markers, bands and screenshot panels. */
+      accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "a colour like #2a78d6"),
+      /** "Typical application": one sentence about the app in real use. */
+      application: z.string().optional(),
+      /** The spec table on the project page: label and value, in this order. */
+      specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
       links: z.array(link).default([]),
       /** "private" or the URL of the public code. */
       code: z.union([z.literal("private"), z.url()]),
@@ -36,6 +42,14 @@ const projects = defineCollection({
           }),
         )
         .default([]),
+      /** A short muted clip, shown first on the project page: the file in public/media/, a poster image, a caption. */
+      video: z
+        .object({
+          src: z.string().regex(/^\/media\/[\w.-]+\.mp4$/, "a file in public/media/, e.g. /media/clip.mp4"),
+          poster: image(),
+          caption: z.string(),
+        })
+        .optional(),
       /** true = left out of the site (for a page that isn't ready). */
       hidden: z.boolean().default(false),
     }),

@@ -6,6 +6,15 @@ tags: [Web app, PWA, Offline]
 card: small
 order: 4
 stack: [TypeScript, React, TanStack Query, Hono, SQLite, vitest, Playwright, PWAs]
+accent: "#c8651b"
+application: "When the payslip arrives: the net pay is already worked out, the payslip is checked line by line, and you can see how much room is left under the student aid limit."
+specs:
+  - { label: Platform, value: "Installable web app (PWA), works offline" }
+  - { label: Rules, value: "Finnish withholding tax, pension and unemployment insurance contributions, Kela's student aid income limit" }
+  - { label: Storage, value: "One SQLite file" }
+  - { label: Languages, value: "Finnish, English" }
+  - { label: Status, value: "In daily use" }
+  - { label: Built, value: "2026" }
 code: private
 images:
   - src: ./01-today.png

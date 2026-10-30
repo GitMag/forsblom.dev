@@ -1,0 +1,104 @@
+---
+// The project selection guide: one row per project (number, name, description, platform, status), each row a
+// link to the project page. On a phone the description and platform columns are left out.
+import { projectUrl, type Project } from "../lib/projects";
+
+interface Props {
+  projects: Project[];
+  caption: string;
+}
+
+const { projects, caption } = Astro.props;
+const spec = (p: Project, label: string) => p.data.specs.find((s) => s.label.toLowerCase() === label)?.value;
+---
+
+<table class="select">
+  <caption>{caption}</caption>
+  <thead>
+    <tr>
+      <th class="num">No.</th>
+      <th>Project</th>
+      <th class="wide">Description</th>
+      <th class="wide">Platform</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      projects.map((p, i) => (
+        <tr data-project={p.id}>
+          <td class="num mono">{i + 1}</td>
+          <th scope="row">
+            <a href={projectUrl(p)}>{p.data.title}</a>
+            <span class="subtitle">{p.data.subtitle}</span>
+          </th>
+          <td class="wide">{p.data.tagline}</td>
+          <td class="wide">{spec(p, "platform")}</td>
+          <td>
+            {spec(p, "status") && (
+              <span class="status">
+                <i class="led" aria-hidden="true" />
+                {spec(p, "status")}
+              </span>
+            )}
+          </td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<style>
+  tbody tr {
+    position: relative;
+  }
+
+  tbody tr:hover {
+    background: var(--fill);
+  }
+
+  /* The row number in the project's own colour: the row marker. */
+  .num {
+    width: 2.5rem;
+    font-weight: 500;
+    color: var(--accent-ink, var(--ink-2));
+  }
+
+  th[scope="row"] {
+    min-width: 9rem;
+  }
+
+  th[scope="row"] a {
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* The whole row is the link. */
+  th[scope="row"] a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  tbody tr:hover a {
+    color: var(--signal);
+  }
+
+  .subtitle {
+    display: block;
+    font-weight: 400;
+    color: var(--ink-2);
+    font-size: 0.85em;
+  }
+
+  .wide {
+    width: 30%;
+  }
+
+  @media (max-width: 47.99rem) {
+    .wide {
+      display: none;
+    }
+  }
+</style>

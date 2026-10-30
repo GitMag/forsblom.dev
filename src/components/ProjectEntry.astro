@@ -1,0 +1,187 @@
+---
+// One project in a list (home page, projects page): "N.n Title — subtitle", the one-line description, the typical
+// application, three key specs and the first screenshot(s) as figures on a panel in the project's colour.
+// The whole entry is a link to the project page. A full entry with phone screenshots shows two of them side by
+// side; compact = one small figure, for the small projects.
+import Figure from "./Figure.astro";
+import SpecTable from "./SpecTable.astro";
+import { projectUrl, type Project } from "../lib/projects";
+
+interface Props {
+  project: Project;
+  compact?: boolean;
+  /** true for the first entry on the page, so its picture loads first. */
+  eager?: boolean;
+}
+
+const { project, compact = false, eager = false } = Astro.props;
+const { title, subtitle, tagline, application, specs, images: shots, video } = project.data;
+// A project with a clip shows the clip's poster frame first, as its still.
+const images = video ? [{ src: video.poster, alt: video.caption }, ...shots] : shots;
+const portrait = images[0] ? images[0].src.height > images[0].src.width : false;
+const shown = !compact && portrait ? images.slice(0, 2) : images.slice(0, 1);
+const sizes = compact
+  ? portrait
+    ? "(min-width: 48rem) 9rem, 32vw"
+    : "(min-width: 48rem) 17rem, 88vw"
+  : portrait
+    ? "(min-width: 48rem) 13rem, 40vw"
+    : "(min-width: 48rem) 32rem, 88vw";
+const url = projectUrl(project);
+---
+
+<article class:list={["entry", "sub", { compact, portrait }]} data-project={project.id}>
+  <h3>
+    <a href={url}>{title}</a>
+    <span class="subtitle">{subtitle}</span>
+  </h3>
+  <div class="text">
+    <p class="tagline">{tagline}</p>
+    {
+      application && !compact && (
+        <p class="application">
+          <span class="label">Typical application</span>
+          {application}
+        </p>
+      )
+    }
+    <SpecTable specs={specs} compact />
+  </div>
+  {
+    shown.length > 0 && (
+      <div class="figs">
+        {shown.map((img, i) => (
+          <Figure src={img.src} alt={img.alt} sizes={sizes} loading={eager && i === 0 ? "eager" : "lazy"} />
+        ))}
+      </div>
+    )
+  }
+</article>
+
+<style>
+  /* Phone: heading, figures, then the text. Desktop: heading and text on the left, figures on the right. */
+  .entry {
+    position: relative;
+    display: grid;
+    grid-template-areas: "head" "figs" "body";
+    gap: 0.75rem 2.5rem;
+    border-top: 1px solid var(--line);
+    padding-block: 1.5rem;
+  }
+
+  h3 {
+    grid-area: head;
+  }
+
+  .figs {
+    grid-area: figs;
+  }
+
+  .text {
+    grid-area: body;
+  }
+
+  @media (min-width: 48rem) {
+    .entry {
+      grid-template-columns: minmax(0, 1fr) 34rem;
+      grid-template-areas: "head figs" "body figs";
+      grid-template-rows: auto 1fr;
+    }
+
+    .entry.portrait {
+      grid-template-columns: minmax(0, 1fr) 32rem;
+    }
+
+    .entry.compact {
+      grid-template-columns: minmax(0, 1fr) 18rem;
+    }
+
+    .entry.compact.portrait {
+      grid-template-columns: minmax(0, 1fr) 11rem;
+    }
+  }
+
+  .text {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  .compact h3 {
+    font-size: 1.05rem;
+  }
+
+  h3 a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* The title link covers the whole entry. */
+  h3 a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .entry:hover h3 a {
+    color: var(--accent-ink, var(--signal));
+  }
+
+  .subtitle {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .subtitle::before {
+    content: " — ";
+  }
+
+  .tagline {
+    max-width: 40em;
+    text-wrap: pretty;
+  }
+
+  .application {
+    max-width: 40em;
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .application .label {
+    display: block;
+    color: var(--accent-ink, var(--ink-2));
+    margin-bottom: 0.15rem;
+  }
+
+  .text :global(table) {
+    max-width: 34rem;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  .figs {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+    min-width: 0;
+  }
+
+  .portrait:not(.compact) .figs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 47.99rem) {
+    .figs {
+      margin-block: 0.25rem;
+    }
+
+    .compact.portrait .figs {
+      max-width: 40vw;
+    }
+  }
+</style>

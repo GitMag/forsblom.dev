@@ -6,6 +6,15 @@ tags: [Web app, Data, AI]
 card: featured
 order: 1
 stack: [TypeScript, Node.js, SQLite, Hono, React, Vite, vitest, Open Food Facts, LLM search]
+accent: "#2a78d6"
+application: "Before the weekly shop: see which of this week's offers beat what you usually pay, put them on the list, and let the coupon autopilot activate the coupons."
+specs:
+  - { label: Platform, value: "Phone-first web app and a command-line tool" }
+  - { label: Data, value: "Lidl Plus receipts, a shelf price list of about 37,000 products (daily), Lidl and K-Ruoka offers, Open Food Facts" }
+  - { label: Storage, value: "One SQLite file on your own machine" }
+  - { label: Languages, value: "Finnish, English" }
+  - { label: Status, value: "In daily use" }
+  - { label: Built, value: "2026" }
 code: private
 images:
   - src: ./01-basket.png

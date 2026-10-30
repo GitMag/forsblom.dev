@@ -1,12 +1,16 @@
 ---
-// One project: the header (subtitle, title, tagline, tags, links), the screenshots in their frames, the Markdown
-// body, the stack and the previous/next links.
+// One project: the title block (title, subtitle, description, links, type, status, code), the screenshots as
+// numbered figures, the Markdown body as numbered sections, the specification table and the previous/next links.
 import Base from "../../layouts/Base.astro";
-import Frame from "../../components/Frame.astro";
-import Chips from "../../components/Chips.astro";
+import TitleBlock from "../../components/TitleBlock.astro";
+import Section from "../../components/Section.astro";
+import Figure from "../../components/Figure.astro";
+import VideoFigure from "../../components/VideoFigure.astro";
+import SpecTable from "../../components/SpecTable.astro";
 import { getImage } from "astro:assets";
 import { render } from "astro:content";
 import { listProjects, projectUrl, type Project } from "../../lib/projects";
+import { bareUrl, revision } from "../../lib/site";
 
 export async function getStaticPaths() {
   const projects = await listProjects();
@@ -23,8 +27,9 @@ interface Props {
 }
 
 const { project, prev, next } = Astro.props;
-const { title, subtitle, tagline, tags, stack, links, code, images } = project.data;
+const { title, subtitle, tagline, application, tags, stack, specs, links, code, images, video } = project.data;
 const { Content } = await render(project);
+const status = specs.find((s) => s.label.toLowerCase() === "status")?.value;
 
 // The share image: the first landscape screenshot, or the site-wide image when there is none.
 const landscape = images.find((i) => i.src.width > i.src.height);
@@ -75,37 +80,66 @@ for (let i = 0; i < images.length; ) {
   image={share?.src}
   imageWidth={share ? Number(share.attributes.width) : undefined}
   imageHeight={share ? Number(share.attributes.height) : undefined}
+  project={project.id}
 >
-  <header class="container head">
-    <p class="eyebrow">{subtitle}</p>
-    <h1>{title}</h1>
+  <TitleBlock title={title} subtitle={subtitle} project={project.id}>
     <p class="lead">{tagline}</p>
-    <Chips items={tags} />
-    <div class="actions">
+    {
+      links.length > 0 && (
+        <div class="actions">
+          {links.map((l, i) => (
+            <a class:list={["btn", { "btn-primary": i === 0 }]} href={l.url}>
+              {l.label} ↗
+            </a>
+          ))}
+        </div>
+      )
+    }
+    <Fragment slot="fields">
+      <div>
+        <dt>Type</dt>
+        <dd>{tags.join(", ")}</dd>
+      </div>
       {
-        links.map((l, i) => (
-          <a class:list={["btn", { "btn-primary": i === 0 }]} href={l.url}>
-            {l.label} ↗
-          </a>
-        ))
-      }
-      {
-        code === "private" ? (
-          <span class="private">
-            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
-              <path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2" fill="none" stroke="currentColor" stroke-width="1.6" />
-              <rect x="2.5" y="7" width="11" height="7.5" rx="1.6" fill="currentColor" />
-            </svg>
-            Private code
-          </span>
-        ) : (
-          <a class="btn" href={code}>
-            Source code ↗
-          </a>
+        status && (
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <span class="status">
+                <i class="led" aria-hidden="true" />
+                {status}
+              </span>
+            </dd>
+          </div>
         )
       }
-    </div>
-  </header>
+      <div>
+        <dt>Code</dt>
+        <dd>{code === "private" ? "Private" : <a href={code}>{bareUrl(code)}</a>}</dd>
+      </div>
+      <div>
+        <dt>Revision</dt>
+        <dd>{revision}</dd>
+      </div>
+    </Fragment>
+  </TitleBlock>
+
+  {
+    application && (
+      <aside class="callout">
+        <p class="label">Typical application</p>
+        <p>{application}</p>
+      </aside>
+    )
+  }
+
+  {
+    video && (
+      <div class="clip">
+        <VideoFigure src={video.src} poster={video.poster} caption={video.caption} />
+      </div>
+    )
+  }
 
   {
     images.length > 0 && (
@@ -116,15 +150,14 @@ for (let i = 0; i < images.length; ) {
               cell === "break" ? (
                 <div class="break" />
               ) : (
-                <figure class:list={["shot", `shot-${cell.img.frame}`]}>
-                  <Frame
+                <div class:list={["shot", `shot-${cell.img.frame}`]}>
+                  <Figure
                     src={cell.img.src}
                     alt={cell.img.alt}
-                    frame={cell.img.frame}
                     loading={cell.index === 0 ? "eager" : "lazy"}
-                    sizes={isPortrait(cell.img) ? "(min-width: 48rem) 20rem, 62vw" : "(min-width: 48rem) 72rem, 88vw"}
+                    sizes={isPortrait(cell.img) ? "(min-width: 48rem) 20rem, 62vw" : "(min-width: 48rem) 68rem, 88vw"}
                   />
-                </figure>
+                </div>
               ),
             )}
           </div>
@@ -133,30 +166,28 @@ for (let i = 0; i < images.length; ) {
     )
   }
 
-  <article class="container body">
-    <div class="prose">
-      <Content />
-    </div>
-    <section class="stack">
-      <h2 class="eyebrow">Stack</h2>
-      <Chips items={stack} />
-    </section>
-  </article>
+  <div class="prose">
+    <Content />
+  </div>
 
-  <nav class="container pager" aria-label="Other projects">
+  <Section title="Specifications" id="specifications">
+    <SpecTable specs={specs} stack={stack} code={code} caption={`${title} at a glance`} />
+  </Section>
+
+  <nav class="pager" aria-label="Other projects">
     {
       prev && (
         <a class="prev" href={projectUrl(prev)}>
-          <span class="eyebrow">← Previous</span>
-          <span class="name">{prev.data.title}</span>
+          <span class="label">Previous</span>
+          <span class="name">← {prev.data.title}</span>
         </a>
       )
     }
     {
       next && (
         <a class="next" href={projectUrl(next)}>
-          <span class="eyebrow">Next →</span>
-          <span class="name">{next.data.title}</span>
+          <span class="label">Next</span>
+          <span class="name">{next.data.title} →</span>
         </a>
       )
     }
@@ -164,44 +195,27 @@ for (let i = 0; i < images.length; ) {
 </Base>
 
 <style>
-  .head {
-    display: grid;
-    gap: 0.9rem;
-    justify-items: start;
-    padding-block: clamp(1.25rem, 5vw, 3.5rem) 0.5rem;
+  .actions {
+    margin-top: 0.5rem;
   }
 
-  .head h1 {
-    max-width: 14em;
-    margin-bottom: 0.15rem;
+  /* The clip, above the screenshots */
+  .clip {
+    margin-top: 2.5rem;
   }
 
-  .head .actions {
-    margin-top: 0.6rem;
-    align-items: center;
-  }
-
-  /* The note for code that is not public: a label, not a button. */
-  .private {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    color: var(--muted);
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding-block: 0.7em;
+  .clip + .gallery {
+    margin-top: 1.5rem;
   }
 
   /* The screenshots */
   .gallery {
     display: grid;
-    gap: 1.25rem;
-    width: min(100%, var(--container) + 2 * var(--gutter));
-    margin: 2rem auto 3.5rem;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
   }
 
   .shot {
-    margin: 0;
     min-width: 0;
   }
 
@@ -226,16 +240,11 @@ for (let i = 0; i < images.length; ) {
   }
 
   @media (max-width: 47.99rem) {
-    .group {
-      padding-inline: var(--gutter);
-    }
-
     .group.scroll {
       display: flex;
       gap: 1rem;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      scroll-padding-inline: var(--gutter);
       padding-bottom: 0.75rem;
       scrollbar-width: thin;
     }
@@ -250,14 +259,14 @@ for (let i = 0; i < images.length; ) {
     }
   }
 
-  /* Wide screens: one justified gallery. Every frame in a row has the same height, because each frame's flex
+  /* Wide screens: one justified gallery. Every frame in a row has the same width share, because each frame's flex
      basis and grow follow its aspect ratio (--r). */
   @media (min-width: 48rem) {
     .gallery {
       display: flex;
       flex-wrap: wrap;
       align-items: flex-start;
-      padding-inline: var(--gutter);
+      gap: 1.5rem;
     }
 
     .group {
@@ -279,29 +288,23 @@ for (let i = 0; i < images.length; ) {
     }
   }
 
-  .body {
-    display: grid;
-    gap: 3rem;
-  }
-
-  .stack {
-    display: grid;
-    gap: 0.75rem;
-    max-width: var(--measure);
+  .prose {
+    margin-top: 0.5rem;
   }
 
   .pager {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: 4rem;
-    padding-top: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 1rem;
     border-top: 1px solid var(--line);
   }
 
   .pager a {
     display: grid;
-    gap: 0.25rem;
+    gap: 0.2rem;
+    color: var(--ink);
     text-decoration: none;
   }
 
@@ -311,11 +314,10 @@ for (let i = 0; i < images.length; ) {
   }
 
   .pager .name {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-weight: 600;
   }
 
   .pager a:hover .name {
-    color: var(--accent);
+    color: var(--signal);
   }
 </style>
