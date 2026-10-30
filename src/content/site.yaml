@@ -1,7 +1,8 @@
 # Texts used across the whole site: the home page intro, the page title and the footer.
 name: Magnus Forsblom
 photo: ./photo.jpg
-photoAlt: Magnus Forsblom in a dark suit and tie
+photoAlt: Magnus Forsblom smiling on a rooftop terrace, with the Tampere skyline behind him
+cvPhoto: ./photo-cv.jpg
 title: "Magnus Forsblom: software developer"
 description: "Software developer in Tampere: full-stack web apps and embedded software."
 location: Tampere, Finland

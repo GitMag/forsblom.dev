@@ -7,6 +7,24 @@ card: small
 order: 5
 stack: [Python, Kodi add-on API, Spotify Web API, OAuth 2 (PKCE), D-Bus/MPRIS]
 accent: "#d6457f"
+why: "The Spotify options for Kodi kept breaking, so I built my own on top of the official app, and then gave it a visualizer."
+backdrop: ./00-visualizer-poster.jpg
+diagram:
+  inputs:
+    - "Game controller or phone remote"
+    - "Spotify Web API (OAuth, PKCE)"
+    - "The Spotify app over MPRIS (D-Bus)"
+    - "LRCLIB lyrics"
+  core:
+    - "Kodi add-on (Python): accounts, browse, Now Playing"
+    - "Synced lyrics"
+  outputs:
+    - "TV interface"
+    - "Full-screen visualizer (C++/OpenGL) with lyrics"
+history:
+  - { date: "2026-10-25", rev: "A", change: "Rebuilt on the official Spotify app, one hidden copy per account, driven over the Web API." }
+  - { date: "2026-10-26", rev: "B", change: "Visualizer stage with synced lyrics." }
+  - { date: "2026-10-28", rev: "C", change: "Status and buttons straight from the app over MPRIS, so it uses no API quota." }
 application: "On the couch with a game controller: pick who's listening, put on an album and open the visualizer with the lyrics."
 specs:
   - { label: Platform, value: "Kodi add-on on a Linux TV PC" }
@@ -18,7 +36,7 @@ code: private
 video:
   src: /media/spotify-visualizer.mp4
   poster: ./00-visualizer-poster.jpg
-  caption: "The visualizer in motion: karaoke-style lyrics over the album backdrop, then the lyrics switched off and the cover glides to the centre with its record."
+  caption: "The visualizer in motion: the cover and its record, then the lyrics in time with the music over the album backdrop, and back to the record."
 images:
   - src: ./02-now-playing.jpg
     alt: "Now Playing: the album cover, the song and album, a progress bar and the playback, shuffle, repeat, like and visualizer buttons, over a backdrop in the album's colours."

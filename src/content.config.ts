@@ -25,6 +25,20 @@ const projects = defineCollection({
       stack: z.array(z.string()).min(1),
       /** The app's own colour (#rrggbb), used for this project's markers, bands and screenshot panels. */
       accent: z.string().regex(/^#[0-9a-fA-F]{6}$/, "a colour like #2a78d6"),
+      /** Why I built it: one sentence in my own voice. */
+      why: z.string().optional(),
+      /** A picture for the project's colour field (e.g. a map or album art); the design dims or blurs it. */
+      backdrop: image().optional(),
+      /** The functional block diagram: what goes in, what does the work, what comes out. One short label per block. */
+      diagram: z
+        .object({
+          inputs: z.array(z.string()).min(1),
+          core: z.array(z.string()).min(1),
+          outputs: z.array(z.string()).min(1),
+        })
+        .optional(),
+      /** Revision history, oldest first: the date, a revision letter and what changed. */
+      history: z.array(z.object({ date: z.string(), rev: z.string(), change: z.string() })).default([]),
       /** "Typical application": one sentence about the app in real use. */
       application: z.string().optional(),
       /** The spec table on the project page: label and value, in this order. */
@@ -62,6 +76,8 @@ const site = defineCollection({
     /** A portrait next to the name (src/content/photo.jpg); leave out for none. */
     photo: image().optional(),
     photoAlt: z.string().default(""),
+    /** A more formal portrait for the printed CV PDF (src/content/photo-cv.jpg); without it the PDF uses `photo`. */
+    cvPhoto: image().optional(),
     title: z.string(),
     description: z.string(),
     location: z.string(),

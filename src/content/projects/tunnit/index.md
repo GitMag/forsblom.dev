@@ -7,6 +7,27 @@ card: small
 order: 4
 stack: [TypeScript, React, TanStack Query, Hono, SQLite, vitest, Playwright, PWAs]
 accent: "#c8651b"
+why: "I wanted to see my real net pay before the payslip arrives, not after."
+diagram:
+  inputs:
+    - "Clock in and out, daily hours (works offline)"
+    - "Tax card and student aid settings"
+    - "Payslip PDF"
+    - "Employer's Excel timesheet"
+  core:
+    - "Pay rules in whole cents: withholding, pension and unemployment contributions"
+    - "Hono API"
+    - "SQLite, one file"
+  outputs:
+    - "Today, Pay and Year screens"
+    - "Limit warnings"
+    - "Timesheet back as Excel"
+history:
+  - { date: "2026-10-26", rev: "A", change: "Scaffold: server, database, sign-in, installable app shell." }
+  - { date: "2026-10-26", rev: "B", change: "Pay rules with tests: holidays, lunch breaks, pay periods, tax and contributions." }
+  - { date: "2026-10-26", rev: "C", change: "Today and Entries screens with an offline outbox." }
+  - { date: "2026-10-26", rev: "D", change: "Pay and Year screens, payslip check, tax card and student aid limits." }
+  - { date: "2026-10-26", rev: "E", change: "Excel timesheet export and import; payslip PDF import." }
 application: "When the payslip arrives: the net pay is already worked out, the payslip is checked line by line, and you can see how much room is left under the student aid limit."
 specs:
   - { label: Platform, value: "Installable web app (PWA), works offline" }

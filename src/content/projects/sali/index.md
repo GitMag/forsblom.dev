@@ -7,6 +7,26 @@ card: featured
 order: 3
 stack: [TypeScript, React, TanStack Query, Hono, SQLite, Vite, vitest, Playwright, PWAs]
 accent: "#0e8a7a"
+why: "I wanted logging a set to take one thumb and two seconds, and to share my workouts with friends."
+diagram:
+  inputs:
+    - "Phone, one thumb between sets"
+    - "Invite and password-reset links"
+    - "Exercise library"
+  core:
+    - "Hono API"
+    - "SQLite, one file"
+    - "Sessions, remembered weights and progress"
+    - "Suggestions and weekly summary (AI)"
+  outputs:
+    - "Installable web app, Finnish and English"
+    - "End-to-end test of every screen"
+history:
+  - { date: "2026-10-18", rev: "A", change: "Accounts, invites and sessions backend; remembered weights; history." }
+  - { date: "2026-10-19", rev: "B", change: "The logging screen, rest timer, progress charts and records." }
+  - { date: "2026-10-20", rev: "C", change: "AI notes when progress stalls, and a weekly summary." }
+  - { date: "2026-10-24", rev: "D", change: "Alternative exercises on the logging screen; in use on a home server." }
+  - { date: "2026-10-26", rev: "E", change: "Drag to reorder workouts, and a recovery view per muscle group." }
 application: "Between sets: tick the set with one thumb, the rest timer starts by itself, and next time the app suggests the weight to try."
 specs:
   - { label: Platform, value: "Installable web app (PWA)" }

@@ -10,14 +10,17 @@ interface Props {
   subtitle?: string;
   photo?: ImageMetadata;
   photoAlt?: string;
+  /** A different photo for print (the CV PDF); the screen keeps `photo`. */
+  printPhoto?: ImageMetadata;
   /** The sizes attribute for the photo; see the widths in the component. */
   photoSizes?: string;
   /** A project's slug: the block gets a band in the project's colour (see /accents.css). */
   project?: string;
 }
 
-const { title, subtitle, photo, photoAlt = "", photoSizes = "(min-width: 48rem) 11rem, 6.5rem", project } = Astro.props;
-const widths = photo ? [...new Set([...[200, 300, 400, 600].filter((w) => w < photo.width), photo.width])] : [];
+const { title, subtitle, photo, photoAlt = "", printPhoto, photoSizes = "(min-width: 48rem) 11rem, 6.5rem", project } =
+  Astro.props;
+const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].filter((w) => w < img.width), img.width])];
 ---
 
 <header class:list={["tb", { "has-photo": !!photo }]} data-project={project}>
@@ -29,17 +32,32 @@ const widths = photo ? [...new Set([...[200, 300, 400, 600].filter((w) => w < ph
   {
     photo && (
       <div class="tb-photo">
-        <Picture
-          src={photo}
-          alt={photoAlt}
-          widths={widths}
-          sizes={photoSizes}
-          formats={["avif", "webp"]}
-          fallbackFormat="jpg"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
+        <div class:list={["pic", { "screen-only": !!printPhoto }]}>
+          <Picture
+            src={photo}
+            alt={photoAlt}
+            widths={widthsFor(photo)}
+            sizes={photoSizes}
+            formats={["avif", "webp"]}
+            fallbackFormat="jpg"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+        {printPhoto && (
+          <div class="pic print-only">
+            <Picture
+              src={printPhoto}
+              alt={photoAlt}
+              widths={widthsFor(printPhoto)}
+              sizes="26mm"
+              formats={["avif", "webp"]}
+              fallbackFormat="jpg"
+              loading="eager"
+            />
+          </div>
+        )}
       </div>
     )
   }
@@ -84,6 +102,14 @@ const widths = photo ? [...new Set([...[200, 300, 400, 600].filter((w) => w < ph
     grid-row: 1 / span 2;
     width: 11rem;
     border-left: 1px solid var(--ink);
+  }
+
+  .tb-photo .pic {
+    height: 100%;
+  }
+
+  .tb-photo .print-only {
+    display: none;
   }
 
   .tb-photo :global(picture),
@@ -157,6 +183,14 @@ const widths = photo ? [...new Set([...[200, 300, 400, 600].filter((w) => w < ph
   }
 
   @media print {
+    .tb-photo .screen-only {
+      display: none;
+    }
+
+    .tb-photo .print-only {
+      display: block;
+    }
+
     .tb {
       margin-top: 0;
     }

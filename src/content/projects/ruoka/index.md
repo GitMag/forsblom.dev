@@ -7,6 +7,30 @@ card: featured
 order: 1
 stack: [TypeScript, Node.js, SQLite, Hono, React, Vite, vitest, Open Food Facts, LLM search]
 accent: "#2a78d6"
+why: "I wanted to know where my grocery money actually goes, and whether this week's offer is really cheaper than what I usually pay."
+diagram:
+  inputs:
+    - "Lidl Plus receipts"
+    - "Lidl shelf price list (daily)"
+    - "Lidl and K-Ruoka offers"
+    - "Open Food Facts"
+  core:
+    - "Sync and receipt parser"
+    - "SQLite, one file"
+    - "Price history and receipt check"
+    - "Cheaper swaps and offer matching"
+    - "Coupon autopilot"
+    - "AI search filters"
+  outputs:
+    - "Phone web app (Hono API + React)"
+    - "Command-line reports"
+history:
+  - { date: "2026-10-16", rev: "A", change: "First version: receipts synced into SQLite, spending report, phone web app." }
+  - { date: "2026-10-16", rev: "B", change: "Store offers from K-Ruoka matched against what you buy." }
+  - { date: "2026-10-17", rev: "C", change: "Shelf price list and price history, cheaper alternatives, categories, Lidl Plus coupons." }
+  - { date: "2026-10-17", rev: "D", change: "Cheapest protein view, new and gone products, receipt check against shelf prices." }
+  - { date: "2026-10-20", rev: "E", change: "Shopping list, readable product names and AI search." }
+  - { date: "2026-10-20", rev: "F", change: "Lidl's weekly offers and \"For you this week\" recommendations." }
 application: "Before the weekly shop: see which of this week's offers beat what you usually pay, put them on the list, and let the coupon autopilot activate the coupons."
 specs:
   - { label: Platform, value: "Phone-first web app and a command-line tool" }

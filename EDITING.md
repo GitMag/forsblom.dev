@@ -6,6 +6,7 @@ All text and images are in `src/content/`. You never need to touch code to chang
 | --- | --- |
 | Home page intro, the "currently" lines, page title, footer links | `src/content/site.yaml` |
 | Your photo | `src/content/photo.jpg` (a portrait, about 4:5); `photo:` and `photoAlt:` in `site.yaml` |
+| The photo in the CV PDF | `src/content/photo-cv.jpg`; `cvPhoto:` in `site.yaml` (leave out to use the same photo) |
 | About / CV page (and the CV PDF, which is made from it) | `src/content/cv.yaml` |
 | A project's text, tags, links or screenshots | `src/content/projects/<name>/index.md` |
 
@@ -35,6 +36,14 @@ card: featured                  # featured = big card on the home page, small = 
 order: 3                        # position, smallest first
 stack: [TypeScript, React]      # technologies; a CV skill with the same name links here
 accent: "#0e8a7a"               # the app's own colour: markers, bands and screenshot panels
+why: "I wanted …"               # why you built it, one sentence in your own voice
+backdrop: ./01-map.png          # optional: a picture for the project's colour field
+diagram:                        # the block diagram: what goes in, what does the work, what comes out
+  inputs: ["Phone", "Invite links"]
+  core: ["Hono API", "SQLite"]
+  outputs: ["Installable web app"]
+history:                        # revision history, oldest first
+  - { date: "2026-10-18", rev: "A", change: "First version." }
 application: "Between sets: …"  # "Typical application": one sentence about the app in real use
 specs:                          # the spec table on the project page, in this order
   - { label: Platform, value: "Installable web app (PWA)" }

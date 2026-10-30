@@ -20,7 +20,12 @@ const projectById = (id: string) => projects.find((p) => p.id === id);
 ---
 
 <Base title="About / CV">
-  <TitleBlock title={site.name} subtitle={`${role} · ${site.location}`} photo={site.photo} photoAlt={site.photoAlt}>
+  <TitleBlock
+    title={site.name}
+    subtitle={`${role} · ${site.location}`}
+    photo={site.photo}
+    photoAlt={site.photoAlt}
+    printPhoto={site.cvPhoto}>
     <div class="actions">
       <a class="btn btn-primary" href={pdf} download>Download CV (PDF)</a>
     </div>
