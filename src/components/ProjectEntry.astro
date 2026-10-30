@@ -32,8 +32,8 @@ const url = projectUrl(project);
 
 <article class:list={["entry", "sub", { compact, portrait }]} data-project={project.id}>
   <h3>
-    <a href={url}>{title}</a>
-    <span class="subtitle">{subtitle}</span>
+    {/* One block, so the name and the subtitle wrap like ordinary text beside the "2.n" number. */}
+    <span class="name"><a href={url}>{title}</a> <span class="subtitle">{subtitle}</span></span>
   </h3>
   <div class="text">
     {/* Why I built it, in my own words, stands in for the tagline (which Table 1 above already shows). */}
@@ -82,23 +82,25 @@ const url = projectUrl(project);
     grid-area: body;
   }
 
+  /* Side by side from 48rem. The text column never gets narrower than 19rem: on in-between widths (or with
+     browser zoom) the figure column gives way instead, down to whatever is left. */
   @media (min-width: 48rem) {
     .entry {
-      grid-template-columns: minmax(0, 1fr) 34rem;
+      grid-template-columns: minmax(19rem, 1fr) minmax(0, 34rem);
       grid-template-areas: "head figs" "body figs";
       grid-template-rows: auto 1fr;
     }
 
     .entry.portrait {
-      grid-template-columns: minmax(0, 1fr) 32rem;
+      grid-template-columns: minmax(19rem, 1fr) minmax(0, 32rem);
     }
 
     .entry.compact {
-      grid-template-columns: minmax(0, 1fr) 18rem;
+      grid-template-columns: minmax(19rem, 1fr) minmax(0, 18rem);
     }
 
     .entry.compact.portrait {
-      grid-template-columns: minmax(0, 1fr) 11rem;
+      grid-template-columns: minmax(19rem, 1fr) minmax(0, 11rem);
     }
   }
 
@@ -130,6 +132,10 @@ const url = projectUrl(project);
 
   .entry:hover h3 a {
     color: var(--accent-ink, var(--signal));
+  }
+
+  .name {
+    min-width: 0;
   }
 
   .subtitle {
@@ -190,8 +196,27 @@ const url = projectUrl(project);
     min-width: 0;
   }
 
+  /* Two phones on one continuous field: no gap between the figures, the fields meet, and the phones are spaced
+     evenly on it. The captions stay under their own pictures, on paper. */
   .portrait:not(.compact) .figs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0;
+  }
+
+  .portrait:not(.compact) .figs :global(figure:first-child .plate) {
+    padding-right: 5.5%;
+  }
+
+  .portrait:not(.compact) .figs :global(figure:last-child .plate) {
+    padding-left: 5.5%;
+  }
+
+  .portrait:not(.compact) .figs :global(figure:first-child figcaption) {
+    padding-right: 0.5rem;
+  }
+
+  .portrait:not(.compact) .figs :global(figure:last-child figcaption) {
+    padding-left: 0.5rem;
   }
 
   @media (max-width: 47.99rem) {

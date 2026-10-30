@@ -2,6 +2,8 @@
 // The document header of a page, like a datasheet's title block: a ruled box with the title and subtitle, the
 // page's own content under them (a description, buttons), a photo cell on the right when there is a photo, and a
 // row of small labelled fields below (pass them in the "fields" slot as <div><dt>Label</dt><dd>Value</dd></div>).
+// With `project` it is the project's cover: filled with the app's family colour (global.css), the grid drawn in
+// light hairlines, light ink; `backdrop` puts a picture behind it, dimmed in the colour or blurred.
 import { Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
 
@@ -14,16 +16,44 @@ interface Props {
   printPhoto?: ImageMetadata;
   /** The sizes attribute for the photo; see the widths in the component. */
   photoSizes?: string;
-  /** A project's slug: the block gets a band in the project's colour (see /accents.css). */
+  /** A project's slug: the block becomes the project's cover in its family colour (see /accents.css). */
   project?: string;
+  /** A picture behind a cover (a map, album art), dimmed in the family colour or blurred. */
+  backdrop?: ImageMetadata;
+  backdropStyle?: "dim" | "blur";
 }
 
-const { title, subtitle, photo, photoAlt = "", printPhoto, photoSizes = "(min-width: 48rem) 11rem, 6.5rem", project } =
-  Astro.props;
+const {
+  title,
+  subtitle,
+  photo,
+  photoAlt = "",
+  printPhoto,
+  photoSizes = "(min-width: 48rem) 11rem, 6.5rem",
+  project,
+  backdrop,
+  backdropStyle = "dim",
+} = Astro.props;
 const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].filter((w) => w < img.width), img.width])];
 ---
 
-<header class:list={["tb", { "has-photo": !!photo }]} data-project={project}>
+<header class:list={["tb", { "has-photo": !!photo, cover: !!project, [`bg-${backdropStyle}`]: !!backdrop }]} data-project={project}>
+  {
+    backdrop && (
+      <div class="tb-bg" aria-hidden="true">
+        <Picture
+          src={backdrop}
+          alt=""
+          widths={[...[720, 1080, 1440].filter((w) => w < backdrop.width), backdrop.width]}
+          sizes="(min-width: 72rem) 68rem, 100vw"
+          formats={["avif", "webp"]}
+          fallbackFormat="webp"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    )
+  }
   <div class="tb-main">
     <h1>{title}</h1>
     {subtitle && <p class="tb-sub">{subtitle}</p>}
@@ -68,15 +98,12 @@ const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].f
 
 <style>
   .tb {
+    --tb-line: var(--ink);
+    --tb-cell-line: var(--line);
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    border: 1px solid var(--ink);
+    border: 1px solid var(--tb-line);
     margin-top: 2rem;
-  }
-
-  /* A project's title block: a band in its colour along the top edge. */
-  .tb[data-project] {
-    border-top: 5px solid var(--accent);
   }
 
   .tb-main {
@@ -101,7 +128,7 @@ const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].f
     grid-column: 2;
     grid-row: 1 / span 2;
     width: 11rem;
-    border-left: 1px solid var(--ink);
+    border-left: 1px solid var(--tb-line);
   }
 
   .tb-photo .pic {
@@ -128,14 +155,14 @@ const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].f
     grid-row: 2;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-    border-top: 1px solid var(--ink);
+    border-top: 1px solid var(--tb-line);
     overflow: hidden;
   }
 
   .tb-fields > :global(div) {
     padding: 0.7rem 1.5rem;
-    border-top: 1px solid var(--line);
-    border-left: 1px solid var(--line);
+    border-top: 1px solid var(--tb-cell-line);
+    border-left: 1px solid var(--tb-cell-line);
     margin: -1px 0 0 -1px;
     min-width: 0;
   }
@@ -161,10 +188,110 @@ const widthsFor = (img: ImageMetadata) => [...new Set([...[200, 300, 400, 600].f
     padding: 0;
   }
 
+  /* ---- A project's cover: the family colour fills the block, the grid is drawn in light hairlines. ---- */
+  .cover {
+    --tb-line: var(--field-line);
+    --tb-cell-line: var(--field-line);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    color: var(--field-ink);
+    background: var(--field-bg);
+    border-top: 5px solid var(--accent);
+  }
+
+  .cover .tb-main {
+    padding: 2rem 1.5rem 1.75rem;
+  }
+
+  .cover .tb-sub,
+  .cover .tb-fields :global(dt) {
+    color: var(--field-ink-2);
+  }
+
+  .cover :global(a:not(.btn)) {
+    color: var(--field-ink);
+  }
+
+  .cover :global(.status .led) {
+    background: var(--field-accent);
+  }
+
+  .cover :global(.btn) {
+    color: var(--field-ink);
+    border-color: rgb(255 255 255 / 0.6);
+    background: transparent;
+  }
+
+  .cover :global(.btn:hover) {
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  .cover :global(.btn-primary) {
+    color: var(--field);
+    background: var(--field-ink);
+    border-color: var(--field-ink);
+  }
+
+  .cover :global(.btn-primary:hover) {
+    background: rgb(255 255 255 / 0.88);
+  }
+
+  /* The picture behind a cover. */
+  .tb-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .tb-bg :global(picture),
+  .tb-bg :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tb-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  /* dim: the picture shows through the family colour as texture, a little more on the right where the text isn't.
+     It is enlarged and softened, so its own panels and labels don't read as text. */
+  .bg-dim .tb-bg :global(img) {
+    object-position: 50% 50%;
+    filter: saturate(0.9) blur(2px);
+    /* Enlarged toward the upper left, so the screenshot's legend chips (top) and time-picker panel (bottom right)
+       fall outside the cover and only the coloured map remains. */
+    transform: scale(1.7);
+    transform-origin: 20% 35%;
+  }
+
+  .bg-dim .tb-bg::after {
+    background: linear-gradient(100deg, oklch(from var(--field) l c h / 0.96) 0%, oklch(from var(--field) l c h / 0.86) 55%, oklch(from var(--field) l c h / 0.74) 100%);
+  }
+
+  /* blur: album art, blurred and darkened, like the visualizer's own backdrop. */
+  .bg-blur .tb-bg :global(img) {
+    filter: blur(44px) saturate(1.25);
+    transform: scale(1.25);
+  }
+
+  .bg-blur .tb-bg::after {
+    background: linear-gradient(180deg, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.35));
+  }
+
   /* Phones: the photo sits beside the title only, the fields stack under both. */
   @media (max-width: 47.99rem) {
-    .tb-main {
+    .tb-main,
+    .cover .tb-main {
       padding: 1.1rem 1rem;
+    }
+
+    .cover .tb-main {
+      padding-top: 1.5rem;
     }
 
     .tb-photo {

@@ -57,11 +57,22 @@ const spec = (p: Project, label: string) => p.data.specs.find((s) => s.label.toL
     background: var(--fill);
   }
 
-  /* The row number in the project's own colour: the row marker. */
+  /* The row number with a solid chip in the project's family colour: the row marker. */
   .num {
-    width: 2.5rem;
+    width: 3.25rem;
     font-weight: 500;
     color: var(--accent-ink, var(--ink-2));
+    white-space: nowrap;
+  }
+
+  tbody .num::before {
+    content: "";
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-right: 0.5em;
+    vertical-align: -0.05em;
+    background: var(--accent);
   }
 
   th[scope="row"] {

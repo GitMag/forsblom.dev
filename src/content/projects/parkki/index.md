@@ -42,7 +42,7 @@ links:
 code: private
 images:
   - src: ./01-desktop.png
-    alt: "Parkki on a desktop: disc parking spots marked with clock icons along a street, and the details of one place."
+    alt: "Parkki on a desktop: the centre of Tampere with every parking area coloured for a two-hour stay, disc parking in blue, paid in orange, garages in purple and free in green, and the time picker."
     frame: browser
   - src: ./02-map.png
     alt: "The map on a phone around the city centre, with paid, disc and garage parking and the time picker at the bottom."

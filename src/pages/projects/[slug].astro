@@ -30,7 +30,8 @@ interface Props {
 }
 
 const { project, prev, next } = Astro.props;
-const { title, subtitle, tagline, why, application, diagram, history, tags, stack, specs, links, code, images, video } = project.data;
+const { title, subtitle, tagline, why, application, diagram, history, tags, stack, specs, links, code, images, video, backdrop } =
+  project.data;
 const { Content } = await render(project);
 const status = specs.find((s) => s.label.toLowerCase() === "status")?.value;
 
@@ -85,8 +86,16 @@ for (let i = 0; i < images.length; ) {
   imageHeight={share ? Number(share.attributes.height) : undefined}
   project={project.id}
 >
-  <TitleBlock title={title} subtitle={subtitle} project={project.id}>
+  <TitleBlock title={title} subtitle={subtitle} project={project.id} backdrop={backdrop} backdropStyle={video ? "blur" : "dim"}>
     <p class="lead">{tagline}</p>
+    {
+      why && (
+        <div class="why">
+          <p class="label">Why I built it</p>
+          <p class="quote">{why}</p>
+        </div>
+      )
+    }
     {
       links.length > 0 && (
         <div class="actions">
@@ -128,21 +137,11 @@ for (let i = 0; i < images.length; ) {
   </TitleBlock>
 
   {
-    (why || application) && (
-      <div class="opening">
-        {why && (
-          <div class="why">
-            <p class="label">Why I built it</p>
-            <p class="quote">{why}</p>
-          </div>
-        )}
-        {application && (
-          <aside class="callout">
-            <p class="label">Typical application</p>
-            <p>{application}</p>
-          </aside>
-        )}
-      </div>
+    application && (
+      <aside class="callout">
+        <p class="label">Typical application</p>
+        <p>{application}</p>
+      </aside>
     )
   }
 
@@ -228,48 +227,36 @@ for (let i = 0; i < images.length; ) {
     margin-top: 0.5rem;
   }
 
-  /* Why I built it, in my own words, beside the typical application. */
-  .opening {
-    display: grid;
-    gap: 1.5rem 3rem;
-    align-items: start;
-    margin-top: 2rem;
-  }
-
-  @media (min-width: 56rem) {
-    .opening {
-      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-    }
-
-    .opening .callout {
-      margin-top: 1.4rem;
-    }
-  }
-
-  .opening .callout {
-    max-width: none;
-  }
-
+  /* Why I built it, in my own words, large inside the cover. */
   .why {
-    max-width: 30em;
+    max-width: 24em;
+    margin-block: 0.75rem 0.25rem;
+  }
+
+  .why .label {
+    color: var(--field-ink-2);
   }
 
   .why .quote {
-    font-size: clamp(1.3rem, 1.05rem + 1vw, 1.75rem);
+    font-size: clamp(1.45rem, 1.1rem + 1.4vw, 2.2rem);
     font-weight: 500;
-    line-height: 1.25;
-    letter-spacing: -0.015em;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     text-wrap: pretty;
   }
 
   .why .quote::before {
     content: "“";
-    color: var(--accent-ink, var(--ink-2));
+    color: var(--field-accent);
   }
 
   .why .quote::after {
     content: "”";
-    color: var(--accent-ink, var(--ink-2));
+    color: var(--field-accent);
+  }
+
+  .callout {
+    margin-top: 2rem;
   }
 
   /* The clip, first and full width: a band across the page in the project's colour, the caption back in the column. */

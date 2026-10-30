@@ -76,15 +76,17 @@ const { inputs, core, outputs } = Astro.props;
     text-wrap: balance;
   }
 
-  /* The core: an outlined group in the project's colour, its blocks filled. */
+  /* The core: one block filled with the family colour, its sub-blocks outlined in light hairlines on it. */
   .col-core ul {
     padding: 0.6rem;
     border: 1px solid var(--accent-ink, var(--ink));
+    background: var(--field-bg, var(--ink));
+    color: var(--field-ink, var(--bg));
   }
 
   .col-core li {
-    background: var(--accent-wash, var(--fill));
-    border-color: var(--accent-line, var(--line));
+    background: rgb(255 255 255 / 0.08);
+    border-color: var(--field-line, var(--line));
     font-weight: 500;
   }
 

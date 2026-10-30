@@ -3,7 +3,7 @@ title: Tunnit
 subtitle: Hours and pay for part-time work
 tagline: Log your work hours and see what each payday really brings, before the payslip arrives.
 tags: [Web app, PWA, Offline]
-card: small
+card: featured
 order: 4
 stack: [TypeScript, React, TanStack Query, Hono, SQLite, vitest, Playwright, PWAs]
 accent: "#c8651b"
