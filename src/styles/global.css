@@ -126,6 +126,8 @@ body {
 main {
   flex: 1;
   counter-reset: section figure table;
+  /* A full-width band (the clip on a project page) may not add a sideways scrollbar. */
+  overflow-x: clip;
 }
 
 h1,

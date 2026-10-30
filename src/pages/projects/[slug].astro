@@ -1,12 +1,15 @@
 ---
-// One project: the title block (title, subtitle, description, links, type, status, code), the screenshots as
-// numbered figures, the Markdown body as numbered sections, the specification table and the previous/next links.
+// One project: the title block (title, subtitle, description, links, type, status, code), why I built it and the
+// typical application, the clip and the screenshots as numbered figures, the Markdown body as numbered sections,
+// the block diagram, the specification table, the revision history and the previous/next links.
 import Base from "../../layouts/Base.astro";
 import TitleBlock from "../../components/TitleBlock.astro";
 import Section from "../../components/Section.astro";
 import Figure from "../../components/Figure.astro";
 import VideoFigure from "../../components/VideoFigure.astro";
 import SpecTable from "../../components/SpecTable.astro";
+import BlockDiagram from "../../components/BlockDiagram.astro";
+import RevisionHistory from "../../components/RevisionHistory.astro";
 import { getImage } from "astro:assets";
 import { render } from "astro:content";
 import { listProjects, projectUrl, type Project } from "../../lib/projects";
@@ -27,7 +30,7 @@ interface Props {
 }
 
 const { project, prev, next } = Astro.props;
-const { title, subtitle, tagline, application, tags, stack, specs, links, code, images, video } = project.data;
+const { title, subtitle, tagline, why, application, diagram, history, tags, stack, specs, links, code, images, video } = project.data;
 const { Content } = await render(project);
 const status = specs.find((s) => s.label.toLowerCase() === "status")?.value;
 
@@ -125,11 +128,21 @@ for (let i = 0; i < images.length; ) {
   </TitleBlock>
 
   {
-    application && (
-      <aside class="callout">
-        <p class="label">Typical application</p>
-        <p>{application}</p>
-      </aside>
+    (why || application) && (
+      <div class="opening">
+        {why && (
+          <div class="why">
+            <p class="label">Why I built it</p>
+            <p class="quote">{why}</p>
+          </div>
+        )}
+        {application && (
+          <aside class="callout">
+            <p class="label">Typical application</p>
+            <p>{application}</p>
+          </aside>
+        )}
+      </div>
     )
   }
 
@@ -170,9 +183,25 @@ for (let i = 0; i < images.length; ) {
     <Content />
   </div>
 
+  {
+    diagram && (
+      <Section title="Functional block diagram" id="block-diagram">
+        <BlockDiagram inputs={diagram.inputs} core={diagram.core} outputs={diagram.outputs} />
+      </Section>
+    )
+  }
+
   <Section title="Specifications" id="specifications">
     <SpecTable specs={specs} stack={stack} code={code} caption={`${title} at a glance`} />
   </Section>
+
+  {
+    history.length > 0 && (
+      <Section title="Revision history" id="revision-history">
+        <RevisionHistory history={history} />
+      </Section>
+    )
+  }
 
   <nav class="pager" aria-label="Other projects">
     {
@@ -199,9 +228,69 @@ for (let i = 0; i < images.length; ) {
     margin-top: 0.5rem;
   }
 
-  /* The clip, above the screenshots */
+  /* Why I built it, in my own words, beside the typical application. */
+  .opening {
+    display: grid;
+    gap: 1.5rem 3rem;
+    align-items: start;
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 56rem) {
+    .opening {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    }
+
+    .opening .callout {
+      margin-top: 1.4rem;
+    }
+  }
+
+  .opening .callout {
+    max-width: none;
+  }
+
+  .why {
+    max-width: 30em;
+  }
+
+  .why .quote {
+    font-size: clamp(1.3rem, 1.05rem + 1vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+  }
+
+  .why .quote::before {
+    content: "“";
+    color: var(--accent-ink, var(--ink-2));
+  }
+
+  .why .quote::after {
+    content: "”";
+    color: var(--accent-ink, var(--ink-2));
+  }
+
+  /* The clip, first and full width: a band across the page in the project's colour, the caption back in the column. */
   .clip {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
     margin-top: 2.5rem;
+  }
+
+  .clip :global(.fig-video .plate) {
+    padding: clamp(1rem, 3vw, 2rem) var(--gutter);
+  }
+
+  .clip :global(.fig-video video) {
+    max-width: 88rem;
+    margin-inline: auto;
+  }
+
+  .clip :global(.fig-video figcaption) {
+    width: min(100% - 2 * var(--gutter), var(--container));
+    margin-inline: auto;
   }
 
   .clip + .gallery {

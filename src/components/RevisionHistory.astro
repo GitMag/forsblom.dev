@@ -1,0 +1,51 @@
+---
+// A project's revision history (`history` in the front matter, oldest first) as a numbered table, newest first
+// like a datasheet's: Rev · Date · Change.
+interface Props {
+  history: { date: string; rev: string; change: string }[];
+  caption?: string;
+}
+
+const { history, caption = "Revision history" } = Astro.props;
+const rows = [...history].reverse();
+---
+
+<table class="history">
+  <caption>{caption}</caption>
+  <thead>
+    <tr>
+      <th class="rev">Rev</th>
+      <th class="date">Date</th>
+      <th>Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    {
+      rows.map((r) => (
+        <tr>
+          <td class="rev mono">{r.rev}</td>
+          <td class="date mono">{r.date}</td>
+          <td>{r.change}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+
+<style>
+  .rev {
+    width: 3rem;
+    font-weight: 500;
+    color: var(--accent-ink, var(--ink));
+  }
+
+  .date {
+    width: 7rem;
+    white-space: nowrap;
+    font-size: 0.85em;
+  }
+
+  tbody .date {
+    color: var(--ink-2);
+  }
+</style>

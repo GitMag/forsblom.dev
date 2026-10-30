@@ -36,13 +36,14 @@ card: featured                  # featured = big card on the home page, small = 
 order: 3                        # position, smallest first
 stack: [TypeScript, React]      # technologies; a CV skill with the same name links here
 accent: "#0e8a7a"               # the app's own colour: markers, bands and screenshot panels
-why: "I wanted …"               # why you built it, one sentence in your own voice
+why: "I wanted …"               # why you built it, in your own voice; shown as a quote on the project page and
+                                # instead of the tagline on the home and projects lists
 backdrop: ./01-map.png          # optional: a picture for the project's colour field
 diagram:                        # the block diagram: what goes in, what does the work, what comes out
   inputs: ["Phone", "Invite links"]
   core: ["Hono API", "SQLite"]
-  outputs: ["Installable web app"]
-history:                        # revision history, oldest first
+  outputs: ["Installable web app"]   # short labels (up to ~6 words) look best in the boxes
+history:                        # revision history; write it oldest first, the page shows it newest first
   - { date: "2026-10-18", rev: "A", change: "First version." }
 application: "Between sets: …"  # "Typical application": one sentence about the app in real use
 specs:                          # the spec table on the project page, in this order

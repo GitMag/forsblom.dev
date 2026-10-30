@@ -15,7 +15,7 @@ interface Props {
 }
 
 const { project, compact = false, eager = false } = Astro.props;
-const { title, subtitle, tagline, application, specs, images: shots, video } = project.data;
+const { title, subtitle, tagline, why, application, specs, images: shots, video } = project.data;
 // A project with a clip shows the clip's poster frame first, as its still.
 const images = video ? [{ src: video.poster, alt: video.caption }, ...shots] : shots;
 const portrait = images[0] ? images[0].src.height > images[0].src.width : false;
@@ -36,7 +36,8 @@ const url = projectUrl(project);
     <span class="subtitle">{subtitle}</span>
   </h3>
   <div class="text">
-    <p class="tagline">{tagline}</p>
+    {/* Why I built it, in my own words, stands in for the tagline (which Table 1 above already shows). */}
+    {why ? <p class="why">{why}</p> : <p class="tagline">{tagline}</p>}
     {
       application && !compact && (
         <p class="application">
@@ -143,6 +144,24 @@ const url = projectUrl(project);
   .tagline {
     max-width: 40em;
     text-wrap: pretty;
+  }
+
+  .why {
+    max-width: 36em;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .why::before {
+    content: "“";
+    color: var(--accent-ink, var(--ink-2));
+  }
+
+  .why::after {
+    content: "”";
+    color: var(--accent-ink, var(--ink-2));
   }
 
   .application {

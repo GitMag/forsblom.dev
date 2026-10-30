@@ -1,0 +1,117 @@
+---
+// The functional block diagram from a project's `diagram` field: three columns, Inputs → Core → Outputs, as
+// hairline boxes with arrows between them. The core blocks sit in an outlined group filled with the project's
+// colour; inputs and outputs are plain outlined boxes. On a phone the columns stack and the arrows point down.
+// It is a numbered figure: the caption gets "Figure N." from the counter in global.css.
+interface Props {
+  inputs: string[];
+  core: string[];
+  outputs: string[];
+}
+
+const { inputs, core, outputs } = Astro.props;
+---
+
+<figure class="fig diagram">
+  <div class="bd">
+    <div class="col">
+      <p class="label">Inputs</p>
+      <ul>{inputs.map((item) => <li>{item}</li>)}</ul>
+    </div>
+    <div class="arrow" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M2 12h18M15 7l5 5-5 5" /></svg>
+    </div>
+    <div class="col col-core">
+      <p class="label">Core</p>
+      <ul>{core.map((item) => <li>{item}</li>)}</ul>
+    </div>
+    <div class="arrow" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M2 12h18M15 7l5 5-5 5" /></svg>
+    </div>
+    <div class="col">
+      <p class="label">Outputs</p>
+      <ul>{outputs.map((item) => <li>{item}</li>)}</ul>
+    </div>
+  </div>
+  <figcaption>Functional block diagram.</figcaption>
+</figure>
+
+<style>
+  .bd {
+    display: grid;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 48rem) {
+    .bd {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.2fr) auto minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+  }
+
+  .col {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .col .label {
+    text-align: center;
+  }
+
+  .col ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .col li {
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--ink-2);
+    font-size: 0.85rem;
+    line-height: 1.35;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* The core: an outlined group in the project's colour, its blocks filled. */
+  .col-core ul {
+    padding: 0.6rem;
+    border: 1px solid var(--accent-ink, var(--ink));
+  }
+
+  .col-core li {
+    background: var(--accent-wash, var(--fill));
+    border-color: var(--accent-line, var(--line));
+    font-weight: 500;
+  }
+
+  .arrow {
+    justify-self: center;
+    width: 1.5rem;
+    color: var(--ink-2);
+  }
+
+  .arrow svg {
+    width: 100%;
+    height: auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Phone: stacked, arrows pointing down. */
+  @media (max-width: 47.99rem) {
+    .arrow {
+      padding-block: 0.25rem;
+    }
+
+    .arrow svg {
+      transform: rotate(90deg);
+    }
+  }
+</style>
