@@ -1,0 +1,92 @@
+---
+// A compact project card: used for the small projects on the home page (text only) and for every project on the
+// projects page (with its visual on top). The whole card is a link to the project page.
+import ProjectVisual from "./ProjectVisual.astro";
+import Chips from "./Chips.astro";
+import { projectUrl, type Project } from "../lib/projects";
+
+interface Props {
+  project: Project;
+  /** Heading level inside the page: 2 or 3. */
+  level?: 2 | 3;
+  /** Show the first image (or the typographic cover) above the text. */
+  visual?: boolean;
+}
+
+const { project, level = 3, visual = false } = Astro.props;
+const { title, subtitle, tagline, tags } = project.data;
+const Heading = level === 2 ? "h2" : "h3";
+const url = projectUrl(project);
+---
+
+<article class="card">
+  {
+    visual && (
+      <div class="visual">
+        <ProjectVisual project={project} sizes="(min-width: 56rem) 34rem, 90vw" />
+      </div>
+    )
+  }
+  <div class="body">
+    <p class="eyebrow">{subtitle}</p>
+    <Heading class="title"><a href={url}>{title}</a></Heading>
+    <p class="tagline">{tagline}</p>
+    <Chips items={tags} />
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .card:hover {
+    border-color: color-mix(in oklch, var(--fg) 35%, var(--line));
+  }
+
+  .visual :global(.plate) {
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--line);
+    aspect-ratio: 16 / 10;
+  }
+
+  .body {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.35rem 1.5rem 1.5rem;
+    flex: 1;
+    align-content: start;
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .title a {
+    text-decoration: none;
+  }
+
+  .title a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .card:hover .title a {
+    color: var(--accent);
+  }
+
+  .tagline {
+    color: var(--muted);
+    text-wrap: pretty;
+    margin-bottom: 0.4rem;
+  }
+</style>

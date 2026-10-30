@@ -1,0 +1,64 @@
+---
+// The top bar: the name (a link home) and two links. Short enough for a phone, so there is no menu button.
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+const path = Astro.url.pathname;
+const current = (prefix: string) => (path.startsWith(prefix) ? "page" : undefined);
+---
+
+<header class="site-header">
+  <div class="container row">
+    <a class="wordmark" href="/" aria-current={path === "/" ? "page" : undefined}>{name}</a>
+    <nav aria-label="Site">
+      <a href="/projects/" aria-current={current("/projects")}>Projects</a>
+      <a href="/about/" aria-current={current("/about")}>About / CV</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    padding-block: 1rem;
+  }
+
+  .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 560;
+    font-size: 1.2rem;
+    letter-spacing: -0.015em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  nav {
+    display: flex;
+    gap: clamp(0.9rem, 3vw, 1.6rem);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  nav a {
+    text-decoration: none;
+    white-space: nowrap;
+    padding-block: 0.25rem;
+    border-bottom: 2px solid transparent;
+  }
+
+  nav a:hover {
+    color: var(--fg);
+    border-bottom-color: var(--line);
+  }
+
+  nav a[aria-current="page"] {
+    border-bottom-color: var(--accent);
+  }
+</style>

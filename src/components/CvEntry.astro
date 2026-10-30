@@ -1,0 +1,124 @@
+---
+// One job or school on the CV page: the organisation, the role or field, the dates and the bullet points.
+// A point is a string, or an object with a text and a link (used for the thesis).
+interface Point {
+  text: string;
+  link?: { label: string; url: string };
+}
+
+interface Props {
+  org: string;
+  role: string;
+  from?: string;
+  to?: string;
+  place?: string;
+  points?: (string | Point)[];
+}
+
+const { org, role, from, to, place, points = [] } = Astro.props;
+const dates = from ? `${from} – ${to ?? "present"}` : (to ?? "");
+const items = points.map((p) => (typeof p === "string" ? { text: p } : p));
+---
+
+<article class="entry">
+  <div class="head">
+    <h3>{org}</h3>
+    {dates && <p class="dates">{dates}</p>}
+  </div>
+  <p class="role">
+    {role}{place && <span class="place"> · {place}</span>}
+  </p>
+  {
+    items.length > 0 && (
+      <ul class="points">
+        {items.map((p) => (
+          <li>
+            {p.text}
+            {p.link && (
+              <>
+                {" "}
+                <a href={p.link.url}>{p.link.label}</a>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .entry {
+    display: grid;
+    gap: 0.3rem;
+    break-inside: avoid;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.25rem 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  .dates {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .role {
+    font-weight: 500;
+  }
+
+  .place {
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .points {
+    padding-left: 1.1em;
+    margin-top: 0.35rem;
+    max-width: var(--measure);
+    text-wrap: pretty;
+  }
+
+  .points li + li {
+    margin-top: 0.3rem;
+  }
+
+  .points li::marker {
+    color: var(--accent);
+  }
+
+  .points a {
+    color: var(--accent);
+  }
+
+  @media print {
+    h3 {
+      font-size: 1.05rem;
+    }
+
+    .points {
+      margin-top: 0.15rem;
+    }
+
+    .points li + li {
+      margin-top: 0.1rem;
+    }
+
+    /* The thesis link: write the address out. */
+    .points a::after {
+      content: " (" attr(href) ")";
+      color: var(--muted);
+      font-size: 0.85em;
+    }
+  }
+</style>

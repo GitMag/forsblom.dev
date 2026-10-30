@@ -1,0 +1,456 @@
+/* Site-wide styles: fonts, colour and spacing tokens, the reset, base typography and the few shared classes
+   (container, buttons, chips, eyebrow, prose, device frames). Component-specific styles live in each component. */
+
+/* ---- Fonts: self-hosted, latin only, variable weight (from the @fontsource-variable packages) ---- */
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2") format("woff2");
+}
+
+/* ---- Tokens ---- */
+:root {
+  color-scheme: light dark;
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Light: warm paper, near-black ink, vermilion accent. */
+  --bg: oklch(98.2% 0.006 85);
+  --fg: oklch(21% 0.014 60);
+  --muted: oklch(46% 0.014 60);
+  --line: oklch(89% 0.009 80);
+  --surface: oklch(95.6% 0.009 85);
+  --accent: oklch(56% 0.19 36);
+  --accent-ink: oklch(99% 0 0);
+  --accent-soft: oklch(56% 0.19 36 / 0.09);
+  --bezel: oklch(17% 0.01 60);
+  --shadow: 0 1px 2px oklch(20% 0.02 60 / 0.08), 0 12px 32px -12px oklch(20% 0.02 60 / 0.22);
+
+  --container: 72rem;
+  --measure: 66ch;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --radius: 10px;
+  --radius-lg: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(17.5% 0.009 60);
+    --fg: oklch(92.5% 0.007 85);
+    --muted: oklch(69% 0.011 70);
+    --line: oklch(29% 0.011 60);
+    --surface: oklch(21.5% 0.011 60);
+    --accent: oklch(74% 0.16 42);
+    --accent-ink: oklch(16% 0.03 40);
+    --accent-soft: oklch(74% 0.16 42 / 0.13);
+    --bezel: oklch(8% 0.006 60);
+    --shadow: 0 1px 2px oklch(0% 0 0 / 0.4), 0 12px 32px -12px oklch(0% 0 0 / 0.6);
+  }
+}
+
+/* ---- Reset and base ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 106.25%; /* 17px */
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 1.35rem + 1.4vw, 2.4rem);
+}
+
+h3 {
+  font-size: 1.45rem;
+}
+
+p,
+ul,
+ol {
+  margin: 0;
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, currentColor 35%, transparent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  text-decoration-color: var(--accent);
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* ---- Shared classes ---- */
+.container {
+  width: min(100% - 2 * var(--gutter), var(--container));
+  margin-inline: auto;
+}
+
+.lead {
+  font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem);
+  line-height: 1.5;
+  max-width: 36em;
+  text-wrap: pretty;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.7em 1.15em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--fg);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+}
+
+.btn:hover {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn-primary:hover {
+  background: color-mix(in oklch, var(--accent) 88%, var(--fg));
+  border-color: color-mix(in oklch, var(--accent) 88%, var(--fg));
+  color: var(--accent-ink);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Chips: tags, stack, skills */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  padding: 0.42em 0.6em;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: var(--bg);
+}
+
+.chip a {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.chip a:hover {
+  text-decoration: underline;
+}
+
+/* Markdown body */
+.prose {
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+.prose > * + * {
+  margin-top: 1em;
+}
+
+.prose h2 {
+  font-size: 1.7rem;
+  margin-top: 2.2em;
+}
+
+.prose h3 {
+  margin-top: 1.6em;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.2em;
+}
+
+.prose li + li {
+  margin-top: 0.45em;
+}
+
+.prose li::marker {
+  color: var(--accent);
+}
+
+.prose a {
+  color: var(--accent);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--surface);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* Section heading row used on the home and the project pages */
+.section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+  transform: translateY(-0.25em);
+}
+
+/* ---- Device frames (see components/Frame.astro). The .frame-box is a size container, so the bezel and the
+   corner radius scale with the frame's width (cqw). ---- */
+.frame-box {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.frame {
+  position: relative;
+}
+
+.frame picture,
+.frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.frame-none .frame img {
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.frame-phone .frame {
+  padding: 2.6cqw;
+  background: var(--bezel);
+  border-radius: 10cqw;
+  box-shadow: var(--shadow), inset 0 0 0 0.5cqw oklch(35% 0.01 60);
+}
+
+.frame-phone .frame img {
+  border-radius: 7.4cqw;
+}
+
+.frame-tv .frame {
+  padding: 1cqw;
+  background: var(--bezel);
+  border-radius: 0.8cqw;
+  box-shadow: var(--shadow);
+}
+
+.frame-tv .frame img {
+  border-radius: 0.3cqw;
+}
+
+.frame-stand {
+  height: 2.6cqw;
+  width: 26cqw;
+  margin: 0 auto;
+  background:
+    linear-gradient(var(--bezel) 0 0) center top / 5cqw 1.8cqw no-repeat,
+    linear-gradient(var(--bezel) 0 0) center bottom / 100% 0.9cqw no-repeat;
+  border-radius: 0 0 1cqw 1cqw;
+}
+
+.frame-browser .frame {
+  border: 1px solid var(--line);
+  border-radius: max(0.9cqw, 6px);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6cqw;
+  height: max(3.2cqw, 20px);
+  padding: 0 1.3cqw;
+  border-bottom: 1px solid var(--line);
+}
+
+.frame-bar i {
+  width: max(1.1cqw, 6px);
+  height: max(1.1cqw, 6px);
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.frame-bar span {
+  flex: 1;
+  max-width: 42%;
+  height: max(1.5cqw, 8px);
+  margin-left: 1.6cqw;
+  border-radius: 1cqw;
+  background: var(--line);
+}
+
+/* ---- Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Print: the About page is the CV; everything that is navigation disappears ---- */
+@media print {
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --muted: #555;
+    --line: #ccc;
+    --surface: #fff;
+    --accent: #b83a16;
+    --shadow: none;
+  }
+
+  html {
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+
+  .site-header,
+  .site-footer,
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .chip {
+    border-color: #ccc;
+    padding: 0.2em 0.45em;
+  }
+}

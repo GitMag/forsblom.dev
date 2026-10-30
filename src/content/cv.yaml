@@ -1,0 +1,74 @@
+# The About / CV page, and the CV PDF made from it. Newest first in every list.
+intro: >-
+  I'm a software developer and a master's student in Information Technology at Tampere University. At work I build
+  full-stack web software and write embedded C for industrial field devices. In my own time I build apps for
+  everyday problems, mostly in TypeScript and Python. I like work where the hardware, the software and the person
+  using it all have to agree.
+
+work:
+  - org: Aline
+    role: Software Developer
+    from: 3/2026
+    points:
+      - "Full-stack development of fertility clinic software: an Angular front end and a Node.js back end."
+  - org: Satron Instruments
+    role: Software Developer
+    from: 9/2024
+    place: Pirkkala
+    points:
+      - Embedded C on STM32 microcontrollers for industrial field devices.
+      - Specialised in the HART communication protocol.
+  - org: Lippu.fi
+    role: Systems Specialist and Nokia Arena on-site support
+    from: 9/2022
+    to: 6/2023
+    place: Tampere
+    points:
+      - Ran and tuned the Citrix virtual environment that delivered the business applications.
+      - Managed user access and permissions, including admin access to business-critical systems.
+      - "Configured the production ticketing system: event layouts, seat maps and HTML email templates."
+      - On-site technical support during large live events, fixing problems under time pressure.
+      - Set up and secured staff devices.
+earlier: "Earlier: grounds maintenance at Siiki Oy (summer 2022) and warehouse work at Matkahuolto (spring 2022)."
+
+education:
+  - org: Tampere University
+    field: Information Technology
+    from: "2022"
+    points:
+      - "Master's studies: major Software Development, minor Embedded Systems."
+      - "Bachelor's degree in Information Technology, 2026: major Embedded Systems, minor Software Development, GPA 3.5."
+      - text: "Bachelor's thesis, grade 5: HART-protokollan päivitys kenttälaitteessa (Updating the HART protocol in a field device)."
+        link:
+          label: Read the thesis
+          url: https://trepo.tuni.fi/handle/10024/232092
+      - Student tutor 2023, helping new students settle in.
+  - org: Svenska samskolan i Tammerfors
+    field: Upper secondary school, matriculation exam
+    to: "2021"
+
+# A skill that is also in a project's "stack" list links to that project.
+skills:
+  - group: Web
+    items: [TypeScript, Angular, React, Node.js, Hono, Vite, SQLite, PWAs, Playwright, vitest]
+  - group: Embedded
+    items: [C, STM32, IAR Embedded Workbench, HART protocol]
+  - group: Other languages
+    items: [Python, C++, Java]
+  - group: Tools
+    items: [Linux, Git, GitHub Actions, Cloudflare Pages]
+
+languages:
+  - name: Finnish
+    level: fluent
+  - name: Swedish
+    level: native
+  - name: English
+    level: fluent
+
+interests:
+  - name: Weightlifting
+    project: sali
+  - name: DJing
+  - name: Arduino and Raspberry Pi projects
+  - name: Fishing

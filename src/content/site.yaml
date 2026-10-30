@@ -1,0 +1,21 @@
+# Texts used across the whole site: the home page intro, the page title and the footer.
+name: Magnus Forsblom
+photo: ./photo.jpg
+photoAlt: Magnus Forsblom in a dark suit and tie
+title: "Magnus Forsblom: software developer"
+description: "Software developer in Tampere: full-stack web apps and embedded software."
+location: Tampere, Finland
+hero: >-
+  Software developer in Tampere. I write embedded software for industrial devices and full-stack web apps, and in
+  my own time I build apps that make everyday things simpler.
+currently:
+  - Master's student at Tampere University
+  - Software developer at Aline and Satron Instruments
+email: magnus@forsblom.dev
+links:
+  - label: LinkedIn
+    url: https://www.linkedin.com/in/magnus-forsblom/
+  - label: GitHub
+    url: https://github.com/GitMag
+footerNote: Built with Astro, hosted on Cloudflare Pages, source on GitHub.
+sourceUrl: https://github.com/GitMag/forsblom.dev

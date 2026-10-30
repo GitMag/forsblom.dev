@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+private/
+.DS_Store
+.wrangler/
+test-results/

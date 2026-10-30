@@ -1,0 +1,76 @@
+---
+// The picture that represents a project on a card: its first image in its frame on a tinted plate, or, while a
+// project has no images, a typographic cover with its initial. Phone frames sit at the top of the plate and are
+// cut off at the bottom, like an app showcase; landscape frames fit inside.
+import Frame from "./Frame.astro";
+import type { Project } from "../lib/projects";
+
+interface Props {
+  project: Project;
+  /** The sizes attribute for the picture; see Frame.astro. */
+  sizes: string;
+  loading?: "lazy" | "eager";
+}
+
+const { project, sizes, loading } = Astro.props;
+const image = project.data.images[0];
+---
+
+<div class:list={["plate", image ? `plate-${image.frame}` : "plate-cover"]}>
+  {
+    image ? (
+      <Frame src={image.src} alt={image.alt} frame={image.frame} sizes={sizes} loading={loading} />
+    ) : (
+      <div class="cover" aria-hidden="true">
+        <span class="cover-letter">{project.data.title.slice(0, 1)}</span>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .plate {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(120% 90% at 85% 0%, var(--accent-soft), transparent 60%),
+      var(--surface);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    padding: 7%;
+  }
+
+  .plate-phone {
+    align-items: start;
+    padding-bottom: 0;
+  }
+
+  .plate-phone :global(.frame-box) {
+    width: 46%;
+  }
+
+  .plate-tv :global(.frame-box) {
+    width: 96%;
+  }
+
+  .cover {
+    display: grid;
+    place-items: center;
+  }
+
+  .cover-letter {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(5rem, 28cqw, 10rem);
+    line-height: 1;
+    color: var(--accent);
+    padding-bottom: 0.12em;
+    border-bottom: 3px solid var(--accent);
+  }
+
+  .plate-cover {
+    container-type: inline-size;
+  }
+</style>

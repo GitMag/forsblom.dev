@@ -1,0 +1,39 @@
+# Builds the site, runs every check and publishes it to Cloudflare Pages: on every push to main, and by hand from the
+# Actions tab. A failed check stops the job before the deploy, so the live site stays as it was.
+name: Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CONTENT_GUARD: ${{ secrets.CONTENT_GUARD }}
+      PROJECT: forsblom-dev
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Install the headless Chromium that prints the CV PDF
+        run: npx playwright install --with-deps chromium-headless-shell
+      - run: npm run check
+      - name: Create the Pages project on the first run
+        run: npx --yes wrangler@4 pages project create "$PROJECT" --production-branch main || true
+      - name: Deploy
+        run: npx --yes wrangler@4 pages deploy dist --project-name "$PROJECT" --branch main --commit-dirty=true

@@ -1,0 +1,321 @@
+---
+// One project: the header (subtitle, title, tagline, tags, links), the screenshots in their frames, the Markdown
+// body, the stack and the previous/next links.
+import Base from "../../layouts/Base.astro";
+import Frame from "../../components/Frame.astro";
+import Chips from "../../components/Chips.astro";
+import { getImage } from "astro:assets";
+import { render } from "astro:content";
+import { listProjects, projectUrl, type Project } from "../../lib/projects";
+
+export async function getStaticPaths() {
+  const projects = await listProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, prev: projects[i - 1], next: projects[i + 1] },
+  }));
+}
+
+interface Props {
+  project: Project;
+  prev?: Project;
+  next?: Project;
+}
+
+const { project, prev, next } = Astro.props;
+const { title, subtitle, tagline, tags, stack, links, code, images } = project.data;
+const { Content } = await render(project);
+
+// The share image: the first landscape screenshot, or the site-wide image when there is none.
+const landscape = images.find((i) => i.src.width > i.src.height);
+const share = landscape ? await getImage({ src: landscape.src, width: 1200, format: "jpg" }) : undefined;
+
+// The gallery's rows. Consecutive phone screenshots form one group: a sideways-scrolling row on a phone, and on
+// wider screens rows of at most four (6 → 3 + 3). A landscape screenshot stands alone; an odd run of them puts the
+// first one on a row of its own, then pairs (3 → 1 + 2). A "break" is a full-width, zero-height flex item on wide
+// screens that starts a new row; it is hidden on a phone.
+type Image = (typeof images)[number];
+type Cell = { img: Image; index: number } | "break";
+const isPortrait = (img: Image) => img.src.height > img.src.width;
+const rowSizes = (n: number, max: number) => {
+  const rows = Math.ceil(n / max);
+  const base = Math.floor(n / rows);
+  const extra = n % rows;
+  return Array.from({ length: rows }, (_, i) => base + (i < extra ? 1 : 0));
+};
+const groups: { scroll: boolean; cells: Cell[] }[] = [];
+for (let i = 0; i < images.length; ) {
+  const portrait = isPortrait(images[i]);
+  let j = i;
+  while (j < images.length && isPortrait(images[j]) === portrait) j++;
+  const run = images.slice(i, j).map((img, k) => ({ img, index: i + k }));
+  if (portrait) {
+    const cells: Cell[] = [];
+    let at = 0;
+    for (const size of rowSizes(run.length, 4)) {
+      if (at > 0) cells.push("break");
+      cells.push(...run.slice(at, at + size));
+      at += size;
+    }
+    groups.push({ scroll: true, cells });
+  } else {
+    run.forEach((cell, k) => {
+      const alone = k === 0 && run.length > 1 && run.length % 2 === 1;
+      groups.push({ scroll: false, cells: alone ? [cell, "break"] : [cell] });
+    });
+  }
+  i = j;
+}
+---
+
+<Base
+  title={`${title}: ${subtitle}`}
+  description={tagline}
+  ogType="article"
+  image={share?.src}
+  imageWidth={share ? Number(share.attributes.width) : undefined}
+  imageHeight={share ? Number(share.attributes.height) : undefined}
+>
+  <header class="container head">
+    <p class="eyebrow">{subtitle}</p>
+    <h1>{title}</h1>
+    <p class="lead">{tagline}</p>
+    <Chips items={tags} />
+    <div class="actions">
+      {
+        links.map((l, i) => (
+          <a class:list={["btn", { "btn-primary": i === 0 }]} href={l.url}>
+            {l.label} ↗
+          </a>
+        ))
+      }
+      {
+        code === "private" ? (
+          <span class="private">
+            <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2" fill="none" stroke="currentColor" stroke-width="1.6" />
+              <rect x="2.5" y="7" width="11" height="7.5" rx="1.6" fill="currentColor" />
+            </svg>
+            Private code
+          </span>
+        ) : (
+          <a class="btn" href={code}>
+            Source code ↗
+          </a>
+        )
+      }
+    </div>
+  </header>
+
+  {
+    images.length > 0 && (
+      <div class="gallery">
+        {groups.map((group) => (
+          <div class:list={["group", { scroll: group.scroll }]}>
+            {group.cells.map((cell) =>
+              cell === "break" ? (
+                <div class="break" />
+              ) : (
+                <figure class:list={["shot", `shot-${cell.img.frame}`]}>
+                  <Frame
+                    src={cell.img.src}
+                    alt={cell.img.alt}
+                    frame={cell.img.frame}
+                    loading={cell.index === 0 ? "eager" : "lazy"}
+                    sizes={isPortrait(cell.img) ? "(min-width: 48rem) 20rem, 62vw" : "(min-width: 48rem) 72rem, 88vw"}
+                  />
+                </figure>
+              ),
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  <article class="container body">
+    <div class="prose">
+      <Content />
+    </div>
+    <section class="stack">
+      <h2 class="eyebrow">Stack</h2>
+      <Chips items={stack} />
+    </section>
+  </article>
+
+  <nav class="container pager" aria-label="Other projects">
+    {
+      prev && (
+        <a class="prev" href={projectUrl(prev)}>
+          <span class="eyebrow">← Previous</span>
+          <span class="name">{prev.data.title}</span>
+        </a>
+      )
+    }
+    {
+      next && (
+        <a class="next" href={projectUrl(next)}>
+          <span class="eyebrow">Next →</span>
+          <span class="name">{next.data.title}</span>
+        </a>
+      )
+    }
+  </nav>
+</Base>
+
+<style>
+  .head {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    padding-block: clamp(1.25rem, 5vw, 3.5rem) 0.5rem;
+  }
+
+  .head h1 {
+    max-width: 14em;
+    margin-bottom: 0.15rem;
+  }
+
+  .head .actions {
+    margin-top: 0.6rem;
+    align-items: center;
+  }
+
+  /* The note for code that is not public: a label, not a button. */
+  .private {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding-block: 0.7em;
+  }
+
+  /* The screenshots */
+  .gallery {
+    display: grid;
+    gap: 1.25rem;
+    width: min(100%, var(--container) + 2 * var(--gutter));
+    margin: 2rem auto 3.5rem;
+  }
+
+  .shot {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .shot-phone {
+    --r: 0.462;
+  }
+
+  .shot-tv {
+    --r: 1.78;
+  }
+
+  .shot-browser {
+    --r: 1.6;
+  }
+
+  .shot-none {
+    --r: 1.5;
+  }
+
+  .break {
+    display: none;
+  }
+
+  @media (max-width: 47.99rem) {
+    .group {
+      padding-inline: var(--gutter);
+    }
+
+    .group.scroll {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      padding-bottom: 0.75rem;
+      scrollbar-width: thin;
+    }
+
+    .group.scroll .shot {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+    }
+
+    .shot-phone {
+      width: min(62vw, 18rem);
+    }
+  }
+
+  /* Wide screens: one justified gallery. Every frame in a row has the same height, because each frame's flex
+     basis and grow follow its aspect ratio (--r). */
+  @media (min-width: 48rem) {
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      padding-inline: var(--gutter);
+    }
+
+    .group {
+      display: contents;
+    }
+
+    .shot {
+      flex: var(--r) 1 calc(var(--r) * 18rem);
+    }
+
+    .shot-phone {
+      max-width: 20rem;
+    }
+
+    .break {
+      display: block;
+      flex-basis: 100%;
+      height: 0;
+    }
+  }
+
+  .body {
+    display: grid;
+    gap: 3rem;
+  }
+
+  .stack {
+    display: grid;
+    gap: 0.75rem;
+    max-width: var(--measure);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .pager a {
+    display: grid;
+    gap: 0.25rem;
+    text-decoration: none;
+  }
+
+  .pager .next {
+    margin-left: auto;
+    text-align: right;
+  }
+
+  .pager .name {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+  }
+
+  .pager a:hover .name {
+    color: var(--accent);
+  }
+</style>

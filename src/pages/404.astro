@@ -1,0 +1,30 @@
+---
+// The not-found page.
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Page not found">
+  <section class="container nf">
+    <p class="eyebrow">404</p>
+    <h1>Page not found</h1>
+    <p class="lead">There is nothing at this address.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="/">Home</a>
+      <a class="btn" href="/projects/">Projects</a>
+      <a class="btn" href="/about/">About / CV</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    padding-block: clamp(3rem, 10vw, 7rem);
+  }
+
+  .nf .actions {
+    margin-top: 1rem;
+  }
+</style>

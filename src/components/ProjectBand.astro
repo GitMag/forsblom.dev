@@ -1,0 +1,109 @@
+---
+// A featured project on the home page: a large band with the visual on one side and the text on the other.
+// Bands alternate sides on wide screens. The whole band is a link to the project page.
+import ProjectVisual from "./ProjectVisual.astro";
+import Chips from "./Chips.astro";
+import { projectUrl, type Project } from "../lib/projects";
+
+interface Props {
+  project: Project;
+  /** Heading level inside the page: 2 or 3. */
+  level?: 2 | 3;
+  /** true for the first band on the page, so its picture loads first. */
+  eager?: boolean;
+}
+
+const { project, level = 3, eager = false } = Astro.props;
+const { title, subtitle, tagline, tags } = project.data;
+const Heading = level === 2 ? "h2" : "h3";
+const url = projectUrl(project);
+---
+
+<article class="band">
+  <div class="visual">
+    <ProjectVisual
+      project={project}
+      sizes="(min-width: 56rem) min(34rem, 46vw), min(88vw, 34rem)"
+      loading={eager ? "eager" : "lazy"}
+    />
+  </div>
+  <div class="text">
+    <p class="eyebrow">{subtitle}</p>
+    <Heading class="title"><a href={url}>{title}</a></Heading>
+    <p class="tagline">{tagline}</p>
+    <Chips items={tags} />
+    <span class="more" aria-hidden="true">Read the case study →</span>
+  </div>
+</article>
+
+<style>
+  .band {
+    position: relative;
+    display: grid;
+    gap: 1.5rem 3.5rem;
+    align-items: center;
+  }
+
+  @media (min-width: 56rem) {
+    .band {
+      grid-template-columns: 1.1fr 1fr;
+    }
+
+    .band:nth-child(even) .visual {
+      order: 2;
+    }
+  }
+
+  .text {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    max-width: 30rem;
+  }
+
+  .title {
+    font-size: clamp(2rem, 1.5rem + 1.8vw, 2.8rem);
+  }
+
+  .title a {
+    text-decoration: none;
+  }
+
+  /* The title link covers the whole band. */
+  .title a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .tagline {
+    font-size: 1.1rem;
+    color: var(--fg);
+    text-wrap: pretty;
+  }
+
+  .more {
+    font-weight: 500;
+    color: var(--accent);
+    margin-top: 0.3rem;
+  }
+
+  .band:hover .title a {
+    color: var(--accent);
+  }
+
+  .band:hover .more {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .visual {
+    transition: transform 0.25s ease;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .band:hover .visual {
+      transform: translateY(-3px);
+    }
+  }
+</style>

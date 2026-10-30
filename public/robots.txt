@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://forsblom.dev/sitemap-index.xml

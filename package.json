@@ -1,0 +1,31 @@
+{
+  "name": "forsblom-dev",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio and CV of Magnus Forsblom, served at forsblom.dev",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "NODE_ENV=production astro build && node scripts/cv-pdf.ts",
+    "preview": "astro preview --port 4321",
+    "guard": "node scripts/guard.ts",
+    "check-dist": "node scripts/check-dist.ts",
+    "check": "astro check && npm run guard -- src/content && npm run build && npm run check-dist && npm run guard -- dist"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
+    "@types/node": "^24.19.2",
+    "playwright": "^1.64.1",
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.1"
+  }
+}

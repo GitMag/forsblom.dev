@@ -1,0 +1,59 @@
+---
+// The footer on every page: the email, the links from site.yaml and the note that links to the source.
+interface Props {
+  email: string;
+  links: { label: string; url: string }[];
+  note: string;
+  sourceUrl: string;
+}
+const { email, links, note, sourceUrl } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="container row">
+    <ul class="links">
+      <li><a href={`mailto:${email}`}>{email}</a></li>
+      {links.map((l) => <li><a href={l.url} rel="me">{l.label}</a></li>)}
+    </ul>
+    <p class="note"><a href={sourceUrl}>{note}</a></p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 6rem;
+    padding-block: 2rem 2.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.9rem;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem 2rem;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-weight: 500;
+  }
+
+  .note {
+    color: var(--muted);
+  }
+
+  .note a {
+    text-decoration-color: transparent;
+  }
+
+  .note a:hover {
+    text-decoration-color: currentColor;
+  }
+</style>

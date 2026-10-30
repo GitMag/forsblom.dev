@@ -1,0 +1,53 @@
+---
+title: Parkki
+subtitle: Tampere parking map
+tagline: A live map of every parking area in Tampere, coloured by what parking costs for the time you stay.
+tags: [Web, Open data, Live]
+card: featured
+order: 2
+stack: [TypeScript, React, MapLibre GL, Vite, vitest, GitHub Actions, Cloudflare Pages]
+links:
+  - label: Open Parkki
+    url: https://parkki-tampere.pages.dev/
+code: private
+images:
+  - src: ./01-desktop.png
+    alt: "Parkki on a desktop: disc parking spots marked with clock icons along a street, and the details of one place."
+    frame: browser
+  - src: ./02-map.png
+    alt: "The map on a phone around the city centre, with paid, disc and garage parking and the time picker at the bottom."
+    frame: phone
+  - src: ./03-disc.png
+    alt: "A disc parking place: set the disc to 12.00 and leave by 14.00."
+    frame: phone
+  - src: ./04-garage.png
+    alt: "A parking garage with the price for a two-hour stay and its price list."
+    frame: phone
+---
+
+## The problem
+
+Parking rules in Tampere are spread across signs, a city map layer and each garage operator's price page. To answer
+"can I park here from 17:30 for two hours, and what does it cost?" you have to read all of them.
+
+## What it does
+
+You pick when you arrive and how long you stay. Every one of the city's ~3,200 parking areas is coloured for that
+exact span:
+
+- disc parking, with the time to set the disc to;
+- free;
+- paid, with the price for the whole stay;
+- a garage, with its price;
+- not allowed: a time limit, a winter maintenance ban or permit holders only.
+
+Tap a place for its rules, its price and directions. "Nearest" lists the closest places you can use.
+
+## How it's built
+
+- A daily data pipeline on GitHub Actions turns the city's open geodata and the garage operators' public price pages
+  into compact JSON. If a source fails, it keeps the last good data.
+- A rules engine evaluates one area for one time span. It handles Finnish public holidays, paid and disc hours, time
+  limits, winter maintenance and spring street sweeping.
+- It is fully static: React and MapLibre in the browser, no server and no login, and your location stays on the phone.
+  It is hosted on Cloudflare Pages.
