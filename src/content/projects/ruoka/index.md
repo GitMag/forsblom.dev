@@ -2,6 +2,7 @@
 title: Ruoka
 subtitle: Grocery spending tracker
 tagline: "Turns grocery receipts into answers: where the money goes, what got more expensive and what to buy cheaper this week."
+description: "Ruoka: a grocery spending tracker that reads Lidl Plus receipts, follows shelf prices every day and finds cheaper alternatives and offers you will use."
 tags: [Web app, Data, AI]
 card: featured
 order: 1

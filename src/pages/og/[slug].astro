@@ -1,0 +1,160 @@
+---
+// A project's share card (1200×630), the picture LinkedIn, Slack and chats show for a link to the project. It is a
+// page only during the build: scripts/og-images.ts photographs each /og/<slug>/ into dist/og/<slug>.png and then
+// deletes the page, so it is never published as HTML. Everything comes from the project's content file.
+import "../../styles/global.css";
+import { Image } from "astro:assets";
+import { getEntry } from "astro:content";
+import { listProjects } from "../../lib/projects";
+
+export async function getStaticPaths() {
+  const projects = await listProjects();
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const site = (await getEntry("site", "site"))!.data;
+const { title, subtitle, why, tagline, images, video, specs } = project.data;
+const shot = images[0]?.src ?? video?.poster;
+const portrait = shot ? shot.height > shot.width : false;
+const status = specs.find((s) => s.label.toLowerCase() === "status")?.value;
+const host = Astro.site?.host ?? "";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>{title} share card</title>
+    <link rel="stylesheet" href="/accents.css" />
+  </head>
+  <body class="og-body">
+    <div class:list={["card", { portrait }]} data-project={project.id}>
+      <div class="text">
+        <p class="kicker">{host}/projects</p>
+        <h1>{title}</h1>
+        <p class="sub">{subtitle}</p>
+        <p class="why">{why ?? tagline}</p>
+        <p class="byline">
+          {site.name}
+          {status && <span class="status"><span class="led" />{status}</span>}
+        </p>
+      </div>
+      {
+        shot && (
+          <div class="shot">
+            <Image src={shot} alt="" width={portrait ? 300 : 620} loading="eager" />
+          </div>
+        )
+      }
+    </div>
+  </body>
+</html>
+
+<style>
+  .og-body {
+    margin: 0;
+    background: #000;
+  }
+
+  .card {
+    position: relative;
+    box-sizing: border-box;
+    width: 1200px;
+    height: 630px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 48px;
+    align-items: center;
+    padding: 56px 64px;
+    overflow: hidden;
+    color: var(--field-ink, #fff);
+    background: var(--field-bg, #111);
+    border-top: 10px solid var(--accent, #2f5fe0);
+  }
+
+  .text {
+    display: grid;
+    gap: 14px;
+    align-content: center;
+  }
+
+  .kicker {
+    margin: 0;
+    font: 500 20px/1 var(--font-mono);
+    letter-spacing: 0.04em;
+    color: var(--field-ink-2, #bbb);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 76px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .sub {
+    margin: 0;
+    font-size: 30px;
+    color: var(--field-ink-2, #bbb);
+  }
+
+  .why {
+    margin: 18px 0 0;
+    max-width: 22em;
+    font-size: 32px;
+    line-height: 1.25;
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .why::before {
+    content: "\201C";
+    color: var(--field-accent, var(--accent));
+  }
+
+  .why::after {
+    content: "\201D";
+    color: var(--field-accent, var(--accent));
+  }
+
+  .byline {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    margin: 22px 0 0;
+    font: 500 21px/1 var(--font-mono);
+    color: var(--field-ink-2, #bbb);
+  }
+
+  .status {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .led {
+    width: 12px;
+    height: 12px;
+    background: var(--field-accent, var(--accent));
+  }
+
+  .shot :global(img) {
+    display: block;
+    height: auto;
+    border: 1px solid var(--field-line, rgb(255 255 255 / 0.3));
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.45);
+  }
+
+  .portrait .shot :global(img) {
+    width: 240px;
+  }
+
+  .card:not(.portrait) .shot :global(img) {
+    width: 520px;
+  }
+</style>

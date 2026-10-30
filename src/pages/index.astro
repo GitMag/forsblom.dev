@@ -6,8 +6,10 @@ import TitleBlock from "../components/TitleBlock.astro";
 import Section from "../components/Section.astro";
 import SelectionTable from "../components/SelectionTable.astro";
 import ProjectEntry from "../components/ProjectEntry.astro";
+import { getImage } from "astro:assets";
 import { getEntry } from "astro:content";
 import { listProjects } from "../lib/projects";
+import { graph, personNode, websiteNode } from "../lib/schema";
 import { bareUrl, revision, roleFrom } from "../lib/site";
 
 const site = (await getEntry("site", "site"))!.data;
@@ -16,22 +18,15 @@ const featured = projects.filter((p) => p.data.card === "featured");
 const small = projects.filter((p) => p.data.card === "small");
 const role = roleFrom(site.title);
 
-// Structured data for search engines.
-const person = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: site.name,
-  url: Astro.site?.href,
-  jobTitle: role,
-  email: `mailto:${site.email}`,
-  address: { "@type": "PostalAddress", addressLocality: site.location },
-  sameAs: site.links.map((l) => l.url),
-};
+// Structured data for search engines: the site and the person (src/lib/schema.ts).
+const cv = (await getEntry("cv", "cv"))!.data;
+const photo = site.photo ? await getImage({ src: site.photo, width: 600, format: "jpg" }) : undefined;
+const jsonLd = graph(websiteNode(site, Astro.site!), personNode(site, cv, Astro.site!, photo?.src));
 ---
 
-<Base>
+<Base fullTitle={site.seo.homeTitle} description={site.seo.homeDescription}>
   <Fragment slot="head">
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(person)} />
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
   </Fragment>
 
   <TitleBlock title={site.name} subtitle={`${role} · ${site.location}`} photo={site.photo} photoAlt={site.photoAlt}>

@@ -2,6 +2,7 @@
 title: Sali
 subtitle: Gym tracker
 tagline: A gym tracker for a few friends, made for logging between sets.
+description: "Sali: a gym tracker web app for a few friends, made for logging sets with one thumb, with a rest timer, progress charts and shared workouts."
 tags: [Web app, PWA]
 card: featured
 order: 3

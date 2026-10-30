@@ -1,6 +1,7 @@
 // Checks over the built site:
 // - every internal href/src/srcset in dist/**/*.html points at a file that exists (external links are not fetched);
-// - no inline <script>, <style> or style="" attribute, which the Content-Security-Policy in public/_headers blocks.
+// - no inline <script>, <style> or style="" attribute, which the Content-Security-Policy in public/_headers blocks;
+// - each page's share image (og:image) exists, and its structured data (JSON-LD) is valid JSON.
 //   JSON-LD (<script type="application/ld+json">) is data, not code, and is allowed.
 //
 //   node scripts/check-dist.ts
@@ -55,6 +56,24 @@ for (const file of htmlFiles(DIST)) {
   if (/<[a-z][^>]*\sstyle="/i.test(html)) {
     console.error(`${relative(DIST, file)}: style="" attribute (blocked by the CSP)`);
     broken++;
+  }
+  // The share image (og:image) must exist, when it is on this site.
+  const og = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
+  if (og) {
+    const path = new URL(og, "https://forsblom.dev").pathname;
+    if (new URL(og, "https://forsblom.dev").host === "forsblom.dev" && !resolves(path)) {
+      console.error(`${relative(DIST, file)}: share image missing: ${path}`);
+      broken++;
+    }
+  }
+  // Structured data must be valid JSON.
+  for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      JSON.parse(m[1]);
+    } catch {
+      console.error(`${relative(DIST, file)}: structured data (JSON-LD) is not valid JSON`);
+      broken++;
+    }
   }
   for (const url of urls) {
     if (!url.startsWith("/") || url.startsWith("//")) continue;

@@ -17,14 +17,30 @@ interface Props {
   image?: string;
   imageWidth?: number;
   imageHeight?: number;
-  ogType?: "website" | "article";
+  /** Alt text of the share image. */
+  imageAlt?: string;
+  ogType?: "website" | "article" | "profile";
+  /** Keep the page out of search engines (the 404 page): no canonical, robots noindex. */
+  noindex?: boolean;
+  /** The full <title>, when the "Page · Name" pattern doesn't fit (the home page). */
+  fullTitle?: string;
   /** A project page: its slug, so the whole page takes the project's accent (see /accents.css). */
   project?: string;
 }
 
 const site = (await getEntry("site", "site"))!.data;
-const { title, description = site.description, image = "/og.png", imageWidth = 1200, imageHeight = 630, ogType = "website", project } = Astro.props;
-const fullTitle = title ? `${title} · ${site.name}` : site.title;
+const {
+  title,
+  description = site.description,
+  image = "/og.png",
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageAlt = `${site.name}: ${site.description}`,
+  ogType = "website",
+  noindex = false,
+  project,
+} = Astro.props;
+const fullTitle = Astro.props.fullTitle ?? (title ? `${title} · ${site.name}` : site.title);
 const canonical = new URL(Astro.url.pathname.replace(/\/?$/, "/"), Astro.site);
 const ogImage = new URL(image, Astro.site);
 ---
@@ -36,7 +52,8 @@ const ogImage = new URL(image, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <meta name="author" content={site.name} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -47,6 +64,7 @@ const ogImage = new URL(image, Astro.site);
     <link rel="preload" href={monoUrl} as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/accents.css" />
     <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="en_GB" />
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -54,10 +72,20 @@ const ogImage = new URL(image, Astro.site);
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content={String(imageWidth)} />
     <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    {
+      ogType === "profile" && (
+        <Fragment>
+          <meta property="profile:first_name" content={site.name.split(" ")[0]} />
+          <meta property="profile:last_name" content={site.name.split(" ").slice(1).join(" ")} />
+        </Fragment>
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     <slot name="head" />
   </head>
   <body>

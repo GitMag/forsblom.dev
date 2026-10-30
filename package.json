@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "NODE_ENV=production astro build && node scripts/cv-pdf.ts",
+    "build": "NODE_ENV=production astro build && node scripts/cv-pdf.ts && node scripts/og-images.ts",
     "preview": "astro preview --port 4321",
     "guard": "node scripts/guard.ts",
     "check-dist": "node scripts/check-dist.ts",

@@ -2,6 +2,7 @@
 title: Tunnit
 subtitle: Hours and pay for part-time work
 tagline: Log your work hours and see what each payday really brings, before the payslip arrives.
+description: "Tunnit: log part-time work hours and see each payday's net pay, withholding tax and the student aid limit before the payslip arrives. Works offline."
 tags: [Web app, PWA, Offline]
 card: featured
 order: 4

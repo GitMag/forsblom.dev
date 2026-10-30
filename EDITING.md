@@ -5,6 +5,7 @@ All text and images are in `src/content/`. You never need to touch code to chang
 | What you want to change | File |
 | --- | --- |
 | Home page intro, the "currently" lines, page title, footer links | `src/content/site.yaml` |
+| What Google and link previews show for the home, projects and CV pages | `seo:` in `src/content/site.yaml` |
 | Your photo | `src/content/photo.jpg` (a portrait, about 4:5); `photo:` and `photoAlt:` in `site.yaml` |
 | The photo in the CV PDF | `src/content/photo-cv.jpg`; `cvPhoto:` in `site.yaml` (leave out to use the same photo) |
 | About / CV page (and the CV PDF, which is made from it) | `src/content/cv.yaml` |
@@ -31,6 +32,7 @@ The top of `index.md`, between the `---` lines, holds the settings:
 title: Sali                     # the name
 subtitle: Gym tracker           # a few words under the name
 tagline: A gym tracker for …    # one sentence, shown on the cards
+description: "Sali: a gym …"    # what Google shows (120–160 characters); left out = the tagline
 tags: [Web app, PWA]            # small labels
 card: featured                  # featured = big card on the home page, small = smaller card
 order: 3                        # position, smallest first
@@ -85,6 +87,11 @@ The lists are newest first. A job without `to:` is shown as current. A point can
 ```
 
 Never put a phone number or a private email here; the site's only email is magnus@forsblom.dev.
+
+## Link previews
+
+Each project's link preview (the picture LinkedIn and chats show) is made automatically at every build from the
+project's title, subtitle, `why` and first screenshot, in its `accent` colour. Nothing to do by hand.
 
 ## The share image and icons
 

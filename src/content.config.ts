@@ -17,6 +17,8 @@ const projects = defineCollection({
       title: z.string(),
       subtitle: z.string(),
       tagline: z.string(),
+      /** The search-engine description; left out, it is the tagline plus "Built with …" from the stack. */
+      description: z.string().optional(),
       tags: z.array(z.string()).min(1),
       /** featured = a large card on the home page; small = a smaller card under them. */
       card: z.enum(["featured", "small"]),
@@ -87,6 +89,15 @@ const site = defineCollection({
     links: z.array(link),
     footerNote: z.string(),
     sourceUrl: z.url(),
+    /** Search engines and link previews: page titles and descriptions (about 120–160 characters each). */
+    seo: z.object({
+      homeTitle: z.string(),
+      homeDescription: z.string(),
+      projectsTitle: z.string(),
+      projectsDescription: z.string(),
+      aboutTitle: z.string(),
+      aboutDescription: z.string(),
+    }),
   }),
 });
 

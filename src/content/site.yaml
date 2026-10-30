@@ -21,3 +21,11 @@ links:
     url: https://github.com/GitMag
 footerNote: Built with Astro, hosted on Cloudflare Pages, source on GitHub.
 sourceUrl: https://github.com/GitMag/forsblom.dev
+# What search engines and link previews show. Keep each description about 120–160 characters.
+seo:
+  homeTitle: "Magnus Forsblom · Software developer in Tampere, Finland"
+  homeDescription: "Magnus Forsblom is a software developer in Tampere, Finland: full-stack web apps and embedded C for industrial devices. Projects, case studies and CV."
+  projectsTitle: "Projects: web apps and tools"
+  projectsDescription: "Apps by Magnus Forsblom with screenshots, block diagrams and specs: a grocery price tracker, a Tampere parking map, a gym log, a pay calculator and more."
+  aboutTitle: "CV"
+  aboutDescription: "CV of Magnus Forsblom, software developer in Tampere: full-stack TypeScript, Angular and Node.js, embedded C on STM32, MSc student at Tampere University."

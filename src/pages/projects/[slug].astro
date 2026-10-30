@@ -15,6 +15,7 @@ import { getImage } from "astro:assets";
 import { render } from "astro:content";
 import { listProjects, projectUrl, type Project } from "../../lib/projects";
 import { bareUrl, revision } from "../../lib/site";
+import { breadcrumbNode, graph, projectDescription, softwareNode } from "../../lib/schema";
 
 export async function getStaticPaths() {
   const projects = await listProjects();
@@ -36,9 +37,17 @@ const { title, subtitle, tagline, why, application, diagram, history, tags, stac
 const { Content } = await render(project);
 const status = specs.find((s) => s.label.toLowerCase() === "status")?.value;
 
-// The share image: the first landscape screenshot, or the site-wide image when there is none.
-const landscape = images.find((i) => i.src.width > i.src.height);
-const share = landscape ? await getImage({ src: landscape.src, width: 1200, format: "jpg" }) : undefined;
+// Search engines and link previews: the description, the share card (made by scripts/og-images.ts from
+// src/pages/og/[slug].astro) and the structured data.
+const description = projectDescription(project);
+const shareCard = `/og/${project.id}.png`;
+const screenshots = await Promise.all(
+  images.map(async (i) => (await getImage({ src: i.src, width: Math.min(i.src.width, 1280), format: "webp" })).src),
+);
+const jsonLd = graph(
+  softwareNode(project, Astro.site!, description, shareCard, screenshots),
+  breadcrumbNode(Astro.site!, [["Home", "/"], ["Projects", "/projects/"], [title, projectUrl(project)]]),
+);
 
 // The gallery's rows. Consecutive phone screenshots form one group: a sideways-scrolling row on a phone, and on
 // wider screens rows of at most four (6 → 3 + 3). A landscape screenshot stands alone; an odd run of them puts the
@@ -80,13 +89,15 @@ for (let i = 0; i < images.length; ) {
 
 <Base
   title={`${title}: ${subtitle}`}
-  description={tagline}
+  description={description}
   ogType="article"
-  image={share?.src}
-  imageWidth={share ? Number(share.attributes.width) : undefined}
-  imageHeight={share ? Number(share.attributes.height) : undefined}
+  image={shareCard}
+  imageAlt={`${title}: ${subtitle}. ${why ?? tagline}`}
   project={project.id}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
+  </Fragment>
   <TitleBlock
     title={title}
     subtitle={subtitle}

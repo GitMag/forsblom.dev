@@ -2,6 +2,7 @@
 title: Parkki
 subtitle: Tampere parking map
 tagline: A live map of every parking area in Tampere, coloured by what parking costs for the time you stay.
+description: "Parkki: a live map of every parking area in Tampere, coloured by price, parking disc and time limits for the time you stay. Built on the city's open data."
 tags: [Web, Open data, Live]
 card: featured
 order: 2

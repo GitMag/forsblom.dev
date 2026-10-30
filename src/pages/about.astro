@@ -9,6 +9,8 @@ import CvEntry from "../components/CvEntry.astro";
 import { getEntry } from "astro:content";
 import { listProjects, projectUrl } from "../lib/projects";
 import { bareUrl, revision, roleFrom } from "../lib/site";
+import { getImage } from "astro:assets";
+import { breadcrumbNode, graph, personId, personNode } from "../lib/schema";
 
 const site = (await getEntry("site", "site"))!.data;
 const cv = (await getEntry("cv", "cv"))!.data;
@@ -17,9 +19,25 @@ const role = roleFrom(site.title);
 const host = Astro.site?.host ?? "";
 const pdf = "/magnus-forsblom-cv.pdf";
 const projectById = (id: string) => projects.find((p) => p.id === id);
+
+// Structured data: this page is the person's profile.
+const photo = site.photo ? await getImage({ src: site.photo, width: 600, format: "jpg" }) : undefined;
+const jsonLd = graph(
+  {
+    "@type": "ProfilePage",
+    url: new URL("/about/", Astro.site).href,
+    name: `${site.seo.aboutTitle} · ${site.name}`,
+    mainEntity: { "@id": personId(Astro.site!) },
+  },
+  personNode(site, cv, Astro.site!, photo?.src),
+  breadcrumbNode(Astro.site!, [["Home", "/"], [site.seo.aboutTitle, "/about/"]]),
+);
 ---
 
-<Base title="About / CV">
+<Base title={site.seo.aboutTitle} description={site.seo.aboutDescription} ogType="profile">
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
+  </Fragment>
   <TitleBlock
     title={site.name}
     subtitle={`${role} · ${site.location}`}

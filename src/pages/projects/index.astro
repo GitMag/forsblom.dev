@@ -5,13 +5,40 @@ import TitleBlock from "../../components/TitleBlock.astro";
 import Section from "../../components/Section.astro";
 import SelectionTable from "../../components/SelectionTable.astro";
 import ProjectEntry from "../../components/ProjectEntry.astro";
-import { listProjects } from "../../lib/projects";
+import { getEntry } from "astro:content";
+import { listProjects, projectUrl } from "../../lib/projects";
 import { revision } from "../../lib/site";
+import { breadcrumbNode, graph, personId } from "../../lib/schema";
 
 const projects = await listProjects();
+const site = (await getEntry("site", "site"))!.data;
+
+// Structured data: a list of the projects.
+const jsonLd = graph(
+  {
+    "@type": "CollectionPage",
+    url: new URL("/projects/", Astro.site).href,
+    name: site.seo.projectsTitle,
+    description: site.seo.projectsDescription,
+    author: { "@id": personId(Astro.site!) },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: projects.map((project, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: project.data.title,
+        url: new URL(projectUrl(project), Astro.site).href,
+      })),
+    },
+  },
+  breadcrumbNode(Astro.site!, [["Home", "/"], ["Projects", "/projects/"]]),
+);
 ---
 
-<Base title="Projects">
+<Base title={site.seo.projectsTitle} description={site.seo.projectsDescription}>
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
+  </Fragment>
   <TitleBlock title="Projects">
     <Fragment slot="fields">
       <div>

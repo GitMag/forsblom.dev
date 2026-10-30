@@ -2,6 +2,7 @@
 title: Spotify for Kodi
 subtitle: Spotify on the TV
 tagline: "Spotify on the TV: browse and play your music in Kodi with a game controller."
+description: "Spotify for Kodi: an add-on that brings Spotify to the TV with a game controller, synced lyrics and a full-screen visualizer over the album art."
 tags: [Kodi add-on, Python]
 card: featured
 order: 5
